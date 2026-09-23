@@ -46,16 +46,17 @@ The `npm ci` dependency is pinned to a JevRouter commit; npm may use GitHub SSH 
 
 ## Decision backends
 
-`CODEX_ROUTER_DECIDER` selects the decision engine. Set it in the environment inherited by Codex commands. The default is `jev`, preserving existing installations. **Only the decider changes; subagent models are always Codex models.**
+`CODEX_ROUTER_DECIDER` selects the decision engine. Set it in the environment inherited by Codex commands. The default is `jev`, preserving existing installations. **Only the decider changes; subagent models are always Codex models.** `http` and `command` name integration methods, not Jev alternatives. A compatible server must accept a text state plus both `choice` and `noul` questions; a matching URL alone is insufficient.
 
 | Value | Integration | Configuration |
 | --- | --- | --- |
 | `jev` (default) | Hosted Jev via JevRouter | `TYPESAFE_API_KEY`, `JEV_API_KEY`, or `OPENROUTER_API_KEY` |
 | `laya` | Local [Laya](https://github.com/NandhaKishorM/laya) server | Default `http://127.0.0.1:8000/v1/systemone`; optional `CODEX_ROUTER_DECIDER_URL` |
+| `kev` | Local [Kev](https://github.com/jaredpalmer/kev) server | Default `http://127.0.0.1:8009/v1/systemone`; optional `CODEX_ROUTER_DECIDER_URL` |
 | `http` | Any Jev-compatible `POST /v1/systemone` service | Required `CODEX_ROUTER_DECIDER_URL` |
 | `command` | Any other engine via a local executable adapter | Required `CODEX_ROUTER_DECIDER_COMMAND`; optional `CODEX_ROUTER_DECIDER_ARGS` as a JSON string array |
 
-For `laya` and `http`, `CODEX_ROUTER_DECIDER_API_KEY` adds a bearer token and `CODEX_ROUTER_DECIDER_MODEL` sets the optional request `model`. The `command` adapter receives one JSON request on stdin and must write one Jev-shaped JSON response to stdout. It runs without a shell. The request has `state` and `questions`; the response must contain `answers.tier` (`choice`, `confidence`, `probabilities`) and `answers.exceptional` (`noul`). The router validates the answer using JevRouter's typed helpers. This contract lets other open-source deciders integrate through a small adapter even when they do not speak Jev's HTTP protocol. It does not imply that every project in [awesome-jev](https://github.com/hellogumbo/awesome-jev) implements a compatible classifier out of the box.
+For `laya`, `kev`, and `http`, `CODEX_ROUTER_DECIDER_API_KEY` adds a bearer token and `CODEX_ROUTER_DECIDER_MODEL` sets the optional request `model`. The `command` adapter receives one JSON request on stdin and must write one Jev-shaped JSON response to stdout. It runs without a shell. The request has `state` and `questions`; the response must contain `answers.tier` (`choice`, `confidence`, `probabilities`) and `answers.exceptional` (`noul`). The router validates the answer using JevRouter's typed helpers. This contract lets other open-source deciders integrate through a small adapter even when they do not speak Jev's HTTP protocol. It does not imply that every project in [awesome-jev](https://github.com/hellogumbo/awesome-jev) implements a compatible classifier out of the box.
 
 Example adapter response:
 
@@ -72,6 +73,10 @@ LAYA_HOST=127.0.0.1 LAYA_DEVICE=cpu .venv-laya/bin/laya-serve
 ```
 
 Then, in the environment that launches Codex, set `export CODEX_ROUTER_DECIDER=laya` and run `npm run doctor -- --live`. Keep Laya bound to loopback if the summaries should stay on this machine. Its checkpoints can be downloaded on first use; warm the server before a live check. Laya's checkpoints have finite input limits, so keep routing summaries short. A shell export in `.zshrc` reaches only processes that inherit that shell environment; a GUI-launched Codex process may need its own environment setup.
+
+For Kev, follow its [local server setup](https://github.com/jaredpalmer/kev/blob/main/README.md#quick-start), start it on port 8009, then set `export CODEX_ROUTER_DECIDER=kev` in the Codex environment. Kev's default model is `kev-latest`; its server accepts the text state and typed questions used here. If the server requires `KEV_API_KEY`, set the same value as `CODEX_ROUTER_DECIDER_API_KEY` for the client. Model weights and runtime are managed by Kev, not this repository.
+
+[PlayJev](https://github.com/OmniJev/PlayJev/blob/main/playjev/serve.py) also exposes `/v1/systemone`, but it requires image frames and supports only `choice`; it rejects the text state and `noul` question used by this router. It is a game-playing model, so it is not a suitable backend here. [hev/reranker](https://github.com/hev/reranker) uses hosted Jev to rank retrieved documents; it is an application of Jev, not an alternative decision engine for model selection.
 
 For a noncompatible engine, configure a local wrapper, for example `CODEX_ROUTER_DECIDER=command`, `CODEX_ROUTER_DECIDER_COMMAND=/absolute/path/to/adapter`, and optionally `CODEX_ROUTER_DECIDER_ARGS='["--model","local"]'`. The wrapper translates the request and returns the typed response. A failed, malformed, or timed-out decision safely selects Sol high.
 

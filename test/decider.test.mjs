@@ -48,6 +48,12 @@ test('command adapter accepts the same JSON contract without a shell', async () 
   assert.equal(result.model, 'gpt-6-luna');
 });
 
+test('Kev selects its local System One endpoint by default', () => {
+  assert.deepEqual(deciderConfig({ CODEX_ROUTER_DECIDER: 'kev' }), {
+    kind: 'kev', configured: true, url: 'http://127.0.0.1:8009/v1/systemone',
+  });
+});
+
 test('invalid decider configuration fails closed to Sol high', async () => {
   const env = { CODEX_ROUTER_DECIDER: 'http', CODEX_ROUTER_DECIDER_URL: 'file:///tmp/decider' };
   assert.equal(deciderConfig(env).configured, false);

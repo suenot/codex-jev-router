@@ -1,7 +1,10 @@
 import { spawn } from 'node:child_process';
 import { evaluate } from 'jevrouter';
 
-const LAYA_URL = 'http://127.0.0.1:8000/v1/systemone';
+const HTTP_PRESETS = {
+  laya: 'http://127.0.0.1:8000/v1/systemone',
+  kev: 'http://127.0.0.1:8009/v1/systemone',
+};
 const TIMEOUT_MS = 15_000;
 const MAX_OUTPUT_BYTES = 1_000_000;
 
@@ -10,8 +13,8 @@ export function deciderConfig(env = process.env) {
   if (kind === 'jev') {
     return { kind, configured: Boolean(env.TYPESAFE_API_KEY || env.JEV_API_KEY || env.OPENROUTER_API_KEY) };
   }
-  if (kind === 'laya' || kind === 'http') {
-    const url = env.CODEX_ROUTER_DECIDER_URL || (kind === 'laya' ? LAYA_URL : '');
+  if (kind === 'laya' || kind === 'kev' || kind === 'http') {
+    const url = env.CODEX_ROUTER_DECIDER_URL || HTTP_PRESETS[kind] || '';
     let valid = false;
     try { valid = ['http:', 'https:'].includes(new URL(url).protocol); } catch { /* Invalid URL. */ }
     return { kind, configured: valid, url };

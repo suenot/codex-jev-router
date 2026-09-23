@@ -4,9 +4,16 @@ All notable changes are documented here in Keep a Changelog format.
 
 ## Unreleased
 
+## [0.3.0] - 2026-09-24
+
 ### Added
 
 - Add a four-panel comic to the English and Russian README files to explain subagent model routing.
+- Add a local Kev decision backend preset.
+
+### Changed
+
+- Clarify the compatibility requirements for HTTP and command adapters and document why PlayJev and hev/reranker are not decision backends for this router.
 
 ## [0.2.0] - 2026-09-23
 
