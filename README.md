@@ -20,6 +20,19 @@ This repository reproduces my Codex subagent setup with [JevRouter](https://gith
 
 The installer configures only subagent model defaults, adds a routing section to `~/.codex/AGENTS.md`, and removes fixed models from the `explorer`, `reviewer`, and `worker` role files. It creates those role files when missing. A parent agent routes a short task summary before `spawn_agent`, then passes the selected `model` and `reasoning_effort` explicitly. Review tasks remain on Sol.
 
+### Search and research
+
+The router also chooses models for **delegated** web research and file or log searches. It chooses a model for the subagent session, not for each web or shell search call. When the parent agent searches directly, it keeps its current model. Delegate only when the research is useful as an independent task; use the `default` role for web research and `explorer` for read-only file or log search.
+
+| Delegated task | Expected route |
+| --- | --- |
+| Find one named symbol, exact log entry, or fact on one known official page | Luna low when the decider is confident |
+| Compare current sources, resolve conflicting claims, or synthesize research | Sol high |
+| Correlate logs across services or trace an ambiguous cause through files | Sol high |
+| Exceptionally difficult investigation or a verified Sol failure | Sol ultra |
+
+Summaries sent to the decider should describe the search objective and scope without copying private logs, source code, or credentials. Uncertain decisions fall back to Sol high.
+
 This is an **instruction-driven workflow**. In a local Codex CLI 0.156.1 smoke test, `collaboration.spawn_agent` did not trigger a `PreToolUse` hook and carried an encrypted task message. The setup therefore does not claim to enforce routing at the tool boundary. [Codex subagent documentation](https://learn.chatgpt.com/docs/agent-configuration/subagents) describes explicit spawn values and role overrides.
 
 ## Instructions for Codex
@@ -76,7 +89,7 @@ Then, in the environment that launches Codex, set `export CODEX_ROUTER_DECIDER=l
 
 For Kev, follow its [local server setup](https://github.com/jaredpalmer/kev/blob/main/README.md#quick-start), start it on port 8009, then set `export CODEX_ROUTER_DECIDER=kev` in the Codex environment. Kev's default model is `kev-latest`; its server accepts the text state and typed questions used here. If the server requires `KEV_API_KEY`, set the same value as `CODEX_ROUTER_DECIDER_API_KEY` for the client. Model weights and runtime are managed by Kev, not this repository.
 
-[PlayJev](https://github.com/OmniJev/PlayJev/blob/main/playjev/serve.py) also exposes `/v1/systemone`, but it requires image frames and supports only `choice`; it rejects the text state and `noul` question used by this router. It is a game-playing model, so it is not a suitable backend here. [hev/reranker](https://github.com/hev/reranker) uses hosted Jev to rank retrieved documents; it is an application of Jev, not an alternative decision engine for model selection.
+[PlayJev](https://github.com/OmniJev/PlayJev/blob/main/playjev/serve.py) also exposes `/v1/systemone`, but it requires image frames and supports only `choice`; it rejects the text state and `noul` question used by this router. It is a game-playing model, so it is not a suitable backend here.
 
 For a noncompatible engine, configure a local wrapper, for example `CODEX_ROUTER_DECIDER=command`, `CODEX_ROUTER_DECIDER_COMMAND=/absolute/path/to/adapter`, and optionally `CODEX_ROUTER_DECIDER_ARGS='["--model","local"]'`. The wrapper translates the request and returns the typed response. A failed, malformed, or timed-out decision safely selects Sol high.
 

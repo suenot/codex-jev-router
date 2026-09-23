@@ -7,10 +7,10 @@ export const LUNA = 'gpt-6-luna';
 const QUESTIONS = {
   tier: {
     type: 'choice',
-    instructions: 'Choose between Luna and Sol for this Codex subagent task. Sol is the normal choice. Pick Luna only for a very simple, bounded, low-risk task with clear instructions.',
+    instructions: 'Which Codex model is sufficient for this subagent task? Judge the actual work, not words such as search or research. Choose luna for one exact bounded lookup or mechanical change; choose sol for synthesis, cross-source verification, diagnosis, ambiguous exploration, implementation, or review.',
     criteria: {
-      luna: 'Very simple, bounded, low-risk exploration, summarization, or mechanical changes with clear acceptance criteria.',
-      sol: 'Normal or difficult implementation, debugging, review, or ambiguous work. Default choice.',
+      luna: 'One exact target and brief result: locate a named symbol or exact log entry; read one known official page and return a fact with its link; simple low-risk extraction or mechanical change with clear acceptance criteria.',
+      sol: 'Compare and verify multiple web sources; investigate logs across services or trace a root cause; explore an ambiguous codebase path; perform normal implementation, debugging, or review.',
     },
   },
   exceptional: {

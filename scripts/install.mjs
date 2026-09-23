@@ -44,6 +44,7 @@ const command = `node ${JSON.stringify(join(root, 'src', 'route.mjs'))} --role=R
 const routingBlock = `${startMarker}\n## Subagent model routing\n\n` +
   `- Before each Codex subagent spawn, run \`${command}\` with a short, sanitized task summary on stdin. Replace ROLE with the actual agent type. Skip routing only when the user explicitly chooses the subagent model.\n` +
   '- Pass the returned `model` and `reasoning_effort` explicitly to `spawn_agent`. If routing fails, use `gpt-6-sol` with `high` effort.\n' +
+  '- Route independent web research and file or log searches before spawning those subagents too. Use `default` for web research and `explorer` for read-only local search. A single exact lookup may use Luna low; comparing sources or diagnosing logs normally uses Sol high. Direct tool calls by the parent keep the parent model.\n' +
   '- Use Sol with `ultra` effort when the router identifies an exceptionally difficult task or after Sol substantively fails. For a retry, start the routing summary with `[codex-router:sol-failed]` and describe the observed failure.\n' +
   '- Do not put credentials or private source text in summaries; the selected decider receives them. Delegate only when a separate agent benefits the task.\n' +
   `${endMarker}`;

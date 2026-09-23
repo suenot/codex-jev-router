@@ -4,6 +4,16 @@ All notable changes are documented here in Keep a Changelog format.
 
 ## Unreleased
 
+## [0.3.1] - 2026-09-24
+
+### Fixed
+
+- Distinguish exact web, file, and log lookups from multi-source research and log diagnosis when choosing a subagent model.
+
+### Changed
+
+- Document how model routing applies to delegated searches and remove an unrelated project reference.
+
 ## [0.3.0] - 2026-09-24
 
 ### Added
@@ -13,7 +23,7 @@ All notable changes are documented here in Keep a Changelog format.
 
 ### Changed
 
-- Clarify the compatibility requirements for HTTP and command adapters and document why PlayJev and hev/reranker are not decision backends for this router.
+- Clarify the compatibility requirements for HTTP and command adapters and document why PlayJev is not a decision backend for this router.
 
 ## [0.2.0] - 2026-09-23
 
