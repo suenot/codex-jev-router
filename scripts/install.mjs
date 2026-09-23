@@ -25,16 +25,7 @@ function upsertKey(section, key, value) {
 }
 
 function updateConfig(original) {
-  const text = original || '';
-  const firstSection = text.search(/^\s*\[[^\]]+\]\s*$/m);
-  let rootSection = firstSection < 0 ? text : text.slice(0, firstSection);
-  const rest = firstSection < 0 ? '' : text.slice(firstSection);
-  for (const [key, value] of [
-    ['model', 'gpt-6-sol'],
-    ['model_reasoning_effort', 'high'],
-    ['plan_mode_reasoning_effort', 'xhigh'],
-  ]) rootSection = upsertKey(rootSection, key, value);
-  let config = `${rootSection.trimEnd()}\n\n${rest.trimStart()}`.trimEnd() + '\n';
+  let config = (original || '').trimEnd() + '\n';
   const header = /^\[agents\]\s*$/m;
   const match = header.exec(config);
   if (!match) config = `${config.trimEnd()}\n\n[agents]\n`;
@@ -53,7 +44,7 @@ const command = `node ${JSON.stringify(join(root, 'src', 'route.mjs'))} --role=R
 const routingBlock = `${startMarker}\n## Subagent model routing\n\n` +
   `- Before each Codex subagent spawn, run \`${command}\` with a short, sanitized task summary on stdin. Replace ROLE with the actual agent type. Skip routing only when the user explicitly chooses the subagent model.\n` +
   '- Pass the returned `model` and `reasoning_effort` explicitly to `spawn_agent`. If routing fails, use `gpt-6-sol` with `high` effort.\n' +
-  '- Use Astra only when the router identifies an exceptionally difficult task or after Sol substantively fails. For a retry, start the routing summary with `[codex-router:sol-failed]` and describe the observed failure.\n' +
+  '- Use Sol with `ultra` effort when the router identifies an exceptionally difficult task or after Sol substantively fails. For a retry, start the routing summary with `[codex-router:sol-failed]` and describe the observed failure.\n' +
   '- Do not put credentials or private source text in summaries; Jev receives them. Delegate only when a separate agent benefits the task.\n' +
   `${endMarker}`;
 

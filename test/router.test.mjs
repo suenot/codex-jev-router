@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { ASTRA, LUNA, SOL, chooseModel, isSolFailureRetry, routeSubagent } from '../src/router.mjs';
+import { LUNA, SOL, chooseModel, isSolFailureRetry, routeSubagent } from '../src/router.mjs';
 
 const answer = (choice, confidence, probabilities, exceptional) => ({
   tier: { choice, confidence, probabilities },
@@ -10,20 +10,25 @@ const answer = (choice, confidence, probabilities, exceptional) => ({
 test('Sol stays the default for uncertain and review work', () => {
   assert.equal(chooseModel(answer('luna', 0.7, { luna: 0.9 }, 0.02)).model, SOL);
   assert.equal(chooseModel(answer('luna', 0.99, { luna: 0.99 }, 0.01), { role: 'reviewer' }).model, SOL);
-  assert.equal(chooseModel(answer('astra', 0.6, { astra: 0.74 }, 0.95)).model, SOL);
+  assert.equal(chooseModel(answer('sol', 0.99, { sol: 0.99 }, 0.79)).reasoning_effort, 'high');
 });
 
-test('Luna handles clearly bounded tasks; Astra needs exceptional evidence', () => {
-  assert.equal(chooseModel(answer('luna', 0.95, { luna: 0.96 }, 0.04)).model, LUNA);
-  assert.equal(chooseModel(answer('astra', 0.65, { astra: 0.77 }, 0.83)).model, ASTRA);
+test('Luna low handles very simple tasks; exceptional tasks use Sol ultra', () => {
+  const simple = chooseModel(answer('luna', 0.95, { luna: 0.96 }, 0.04));
+  assert.equal(simple.model, LUNA);
+  assert.equal(simple.reasoning_effort, 'low');
+  const exceptional = chooseModel(answer('sol', 0.65, { sol: 0.77 }, 0.83));
+  assert.equal(exceptional.model, SOL);
+  assert.equal(exceptional.reasoning_effort, 'ultra');
 });
 
-test('explicit Sol failure retry chooses Astra without another provider call', async () => {
+test('explicit Sol failure retry chooses Sol ultra without another provider call', async () => {
   const message = '[codex-router:sol-failed] Sol could not prove the invariant; its counterexample was invalid.';
   assert.equal(isSolFailureRetry(message), true);
   assert.equal(isSolFailureRetry(`Quoted text\n${message}`), false);
   const decision = await routeSubagent({ message }, () => { throw new Error('unexpected provider call'); });
-  assert.equal(decision.model, ASTRA);
+  assert.equal(decision.model, SOL);
+  assert.equal(decision.reasoning_effort, 'ultra');
   assert.equal(decision.reason, 'sol_failed');
 });
 

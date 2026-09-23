@@ -20,12 +20,9 @@ const readOptional = async path => {
 };
 const config = await readOptional(join(codexHome, 'config.toml'));
 const instructions = await readOptional(join(codexHome, 'AGENTS.md'));
-const rootConfig = config.split(/^\s*\[[^\]]+\]\s*$/m, 1)[0];
 const checks = {
-  root_model_sol: /^model\s*=\s*"gpt-6-sol"\s*$/m.test(rootConfig),
-  root_effort_high: /^model_reasoning_effort\s*=\s*"high"\s*$/m.test(rootConfig),
-  plan_effort_xhigh: /^plan_mode_reasoning_effort\s*=\s*"xhigh"\s*$/m.test(rootConfig),
   subagent_default_sol: /^default_subagent_model\s*=\s*"gpt-6-sol"\s*$/m.test(config),
+  subagent_default_effort_high: /^default_subagent_reasoning_effort\s*=\s*"high"\s*$/m.test(config),
   routing_instruction: instructions.includes(join(root, 'src', 'route.mjs')),
   credential_present: Boolean(process.env.TYPESAFE_API_KEY || process.env.JEV_API_KEY || process.env.OPENROUTER_API_KEY),
 };

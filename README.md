@@ -8,13 +8,11 @@ This repository reproduces my Codex subagent setup with [JevRouter](https://gith
 
 | Setting | Value |
 | --- | --- |
-| Main Codex model | `gpt-6-sol`, `high` reasoning |
-| Plan mode reasoning | `xhigh` (the model remains Sol) |
-| Subagent fallback | `gpt-6-sol`, `high` reasoning |
-| Simple, bounded subagent task | `gpt-6-luna`, `medium`, only with strong Jev confidence |
-| Exceptional task or verified Sol failure | `gpt-6-astra`, `xhigh` |
+| Normal subagent task or fallback | `gpt-6-sol`, `high` reasoning |
+| Very simple, bounded subagent task | `gpt-6-luna`, `low`, only with strong Jev confidence |
+| Exceptional task or verified Sol failure | `gpt-6-sol`, `ultra` |
 
-The installer adds a routing section to `~/.codex/AGENTS.md` and removes fixed models from the `explorer`, `reviewer`, and `worker` role files. It creates those role files when missing. A parent agent routes a short task summary before `spawn_agent`, then passes the selected `model` and `reasoning_effort` explicitly. Review tasks remain on Sol unless Astra qualifies.
+The installer configures only subagent model defaults, adds a routing section to `~/.codex/AGENTS.md`, and removes fixed models from the `explorer`, `reviewer`, and `worker` role files. It creates those role files when missing. A parent agent routes a short task summary before `spawn_agent`, then passes the selected `model` and `reasoning_effort` explicitly. Review tasks remain on Sol.
 
 This is an **instruction-driven workflow**. In a local Codex CLI 0.156.1 smoke test, `collaboration.spawn_agent` did not trigger a `PreToolUse` hook and carried an encrypted task message. The setup therefore does not claim to enforce routing at the tool boundary. [Codex subagent documentation](https://learn.chatgpt.com/docs/agent-configuration/subagents) describes explicit spawn values and role overrides.
 
@@ -53,7 +51,7 @@ printf '%s\n' 'Find the definition of calculateTotal and report its path.' \
   | node src/route.mjs --role=explorer
 ```
 
-The command prints JSON with `model`, `reasoning_effort`, and `reason`. Pass the first two fields to `spawn_agent`. Astra is selected up front only when Jev reports a sufficiently exceptional task. After a **substantive, observed Sol failure**, start the new routing summary with `[codex-router:sol-failed]` followed by the failure description. The parent agent must verify the failure; this marker is not proof by itself.
+The command prints JSON with `model`, `reasoning_effort`, and `reason`. Pass the first two fields to `spawn_agent`. Sol `ultra` is selected up front only when Jev reports a sufficiently exceptional task. After a **substantive, observed Sol failure**, start the new routing summary with `[codex-router:sol-failed]` followed by the failure description. The parent agent must verify the failure; this marker is not proof by itself.
 
 ## Rollback
 
