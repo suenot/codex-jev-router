@@ -6,7 +6,7 @@ import { routeSubagent } from '../src/router.mjs';
 
 const response = {
   answers: {
-    tier: { type: 'choice', choice: 'luna', confidence: 0.96, probabilities: { luna: 0.96, sol: 0.04 } },
+    tier: { type: 'choice', choice: 'luna_low', confidence: 0.96, probabilities: { luna_low: 0.96, luna_medium: 0.01, sol_low: 0.01, sol_high: 0.02 } },
     exceptional: { type: 'noul', noul: 0.02 },
   },
 };
@@ -31,6 +31,7 @@ test('Laya-compatible HTTP decider receives typed questions and selects Luna', a
     assert.equal(request.body.model, 'multilingual');
     assert.equal(request.body.state.role, 'explorer');
     assert.equal(request.body.questions.tier.type, 'choice');
+    assert.deepEqual(Object.keys(request.body.questions.tier.criteria), ['luna_low', 'luna_medium', 'sol_low', 'sol_high']);
     assert.equal(request.body.questions.exceptional.type, 'noul');
   } finally {
     server.close();

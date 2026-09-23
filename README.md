@@ -6,7 +6,7 @@
   <img src="assets/subagent-routing-comic.png" alt="A small decider routes a simple lookup to Luna, an ordinary bug to Sol, and a complex task to Sol with deeper reasoning." width="820">
 </p>
 
-One short decision before each subagent gives a simple task to Luna low, ordinary work to Sol high, and exceptional work to Sol ultra.
+One short decision before each subagent selects Luna low or medium, Sol low or high, or Sol ultra for exceptional work.
 
 This repository reproduces my Codex subagent setup with [JevRouter](https://github.com/BillionsBobby/JevRouter) or another typed decision engine. It is meant to be handed to a future Codex session as an instruction: **read this file, clone the repository, run the installer, and verify the result**. The installer modifies only local Codex configuration and creates a backup first. It does not require a server deployment.
 
@@ -16,9 +16,11 @@ This repository reproduces my Codex subagent setup with [JevRouter](https://gith
 | --- | --- |
 | Normal subagent task or fallback | `gpt-6-sol`, `high` reasoning |
 | Very simple, bounded subagent task | `gpt-6-luna`, `low`, only with strong decider confidence |
+| Clear, bounded task with a few straightforward steps | `gpt-6-luna`, `medium`, only with strong decider confidence |
+| Short, focused task requiring Sol-level judgment | `gpt-6-sol`, `low`, only with strong decider confidence |
 | Exceptional task or verified Sol failure | `gpt-6-sol`, `ultra` |
 
-The installer configures only subagent model defaults, adds a routing section to `~/.codex/AGENTS.md`, and removes fixed models from the `explorer`, `reviewer`, and `worker` role files. It creates those role files when missing. A parent agent routes a short task summary before `spawn_agent`, then passes the selected `model` and `reasoning_effort` explicitly. Review tasks remain on Sol.
+The installer configures only subagent model defaults, adds a routing section to `~/.codex/AGENTS.md`, and removes fixed models from the `explorer`, `reviewer`, and `worker` role files. It creates those role files when missing. A parent agent routes a short task summary before `spawn_agent`, then passes the selected `model` and `reasoning_effort` explicitly. The `reviewer` role remains on Sol high unless the task qualifies for Sol ultra.
 
 ### Search and research
 
@@ -27,6 +29,8 @@ The router also chooses models for **delegated** web research and file or log se
 | Delegated task | Expected route |
 | --- | --- |
 | Find one named symbol, exact log entry, or fact on one known official page | Luna low when the decider is confident |
+| Extract facts from a few specified files or logs and return a structured summary | Luna medium when the decider is confident |
+| Verify one specific claim against an authoritative page or compare two documented options | Sol low when the decider is confident |
 | Compare current sources, resolve conflicting claims, or synthesize research | Sol high |
 | Correlate logs across services or trace an ambiguous cause through files | Sol high |
 | Exceptionally difficult investigation or a verified Sol failure | Sol ultra |
@@ -69,12 +73,12 @@ The `npm ci` dependency is pinned to a JevRouter commit; npm may use GitHub SSH 
 | `http` | Any Jev-compatible `POST /v1/systemone` service | Required `CODEX_ROUTER_DECIDER_URL` |
 | `command` | Any other engine via a local executable adapter | Required `CODEX_ROUTER_DECIDER_COMMAND`; optional `CODEX_ROUTER_DECIDER_ARGS` as a JSON string array |
 
-For `laya`, `kev`, and `http`, `CODEX_ROUTER_DECIDER_API_KEY` adds a bearer token and `CODEX_ROUTER_DECIDER_MODEL` sets the optional request `model`. The `command` adapter receives one JSON request on stdin and must write one Jev-shaped JSON response to stdout. It runs without a shell. The request has `state` and `questions`; the response must contain `answers.tier` (`choice`, `confidence`, `probabilities`) and `answers.exceptional` (`noul`). The router validates the answer using JevRouter's typed helpers. This contract lets other open-source deciders integrate through a small adapter even when they do not speak Jev's HTTP protocol. It does not imply that every project in [awesome-jev](https://github.com/hellogumbo/awesome-jev) implements a compatible classifier out of the box.
+For `laya`, `kev`, and `http`, `CODEX_ROUTER_DECIDER_API_KEY` adds a bearer token and `CODEX_ROUTER_DECIDER_MODEL` sets the optional request `model`. The `command` adapter receives one JSON request on stdin and must write one Jev-shaped JSON response to stdout. It runs without a shell. The request has `state` and `questions`; the response must contain `answers.tier` (`choice`, `confidence`, `probabilities`) and `answers.exceptional` (`noul`). The `tier` choice is `luna_low`, `luna_medium`, `sol_low`, or `sol_high`; older adapter responses using `luna` still select Luna low. The router validates the answer using JevRouter's typed helpers. This contract lets other open-source deciders integrate through a small adapter even when they do not speak Jev's HTTP protocol. It does not imply that every project in [awesome-jev](https://github.com/hellogumbo/awesome-jev) implements a compatible classifier out of the box.
 
 Example adapter response:
 
 ```json
-{"answers":{"tier":{"type":"choice","choice":"sol","confidence":0.9,"probabilities":{"luna":0.1,"sol":0.9}},"exceptional":{"type":"noul","noul":0.02}}}
+{"answers":{"tier":{"type":"choice","choice":"sol_low","confidence":0.9,"probabilities":{"luna_low":0.02,"luna_medium":0.03,"sol_low":0.9,"sol_high":0.05}},"exceptional":{"type":"noul","noul":0.02}}}
 ```
 
 For local Laya, install and start its [Jev-compatible HTTP server](https://github.com/NandhaKishorM/laya#self-hosting-http-server-jev-compatible) separately:

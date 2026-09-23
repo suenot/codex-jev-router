@@ -7,10 +7,12 @@ export const LUNA = 'gpt-6-luna';
 const QUESTIONS = {
   tier: {
     type: 'choice',
-    instructions: 'Which Codex model is sufficient for this subagent task? Judge the actual work, not words such as search or research. Choose luna for one exact bounded lookup or mechanical change; choose sol for synthesis, cross-source verification, diagnosis, ambiguous exploration, implementation, or review.',
+    instructions: 'Choose the lightest Codex subagent profile sufficient for this task. Judge the actual work, not labels such as search or research. Use sol_high when the scope or required judgment is uncertain.',
     criteria: {
-      luna: 'One exact target and brief result: locate a named symbol or exact log entry; read one known official page and return a fact with its link; simple low-risk extraction or mechanical change with clear acceptance criteria.',
-      sol: 'Compare and verify multiple web sources; investigate logs across services or trace a root cause; explore an ambiguous codebase path; perform normal implementation, debugging, or review.',
+      luna_low: 'One exact target and brief result: find a named symbol or exact log entry, read one known page for a fact, or make a trivial mechanical edit. Almost no judgment.',
+      luna_medium: 'Clear bounded brief with several straightforward coordinated steps: extract facts from a few specified files or logs, summarize known material, or make small prescribed edits in known files. Little ambiguity.',
+      sol_low: 'Short focused task needing Sol-level judgment: check one specific claim against an authoritative source, assess one small diff, or choose between two documented options. Limited investigation.',
+      sol_high: 'Default for ambiguous or multi-source research, root-cause diagnosis, normal implementation, substantial code review, or work requiring synthesis and validation.',
     },
   },
   exceptional: {
@@ -23,11 +25,6 @@ const QUESTIONS = {
   },
 };
 
-const effort = (model) => {
-  if (model === LUNA) return 'low';
-  return 'high';
-};
-
 function score(answer, key) {
   const value = answer.probabilities?.[key];
   return typeof value === 'number' && Number.isFinite(value) ? value : 0;
@@ -36,10 +33,18 @@ function score(answer, key) {
 export function chooseModel({ tier, exceptional }, { role = 'default', solFailed = false } = {}) {
   if (solFailed) return { model: SOL, reasoning_effort: 'ultra', reason: 'sol_failed' };
   if (exceptional.noul >= 0.8) return { model: SOL, reasoning_effort: 'ultra', reason: 'exceptional' };
-  if (role !== 'reviewer' && tier.choice === 'luna' && score(tier, 'luna') >= 0.85 && tier.confidence >= 0.75 && exceptional.noul <= 0.1) {
-    return { model: LUNA, reasoning_effort: effort(LUNA), reason: 'simple' };
+  if (role !== 'reviewer' && exceptional.noul <= 0.1 && tier.confidence >= 0.75) {
+    if ((tier.choice === 'luna_low' && score(tier, 'luna_low') >= 0.85) || (tier.choice === 'luna' && score(tier, 'luna') >= 0.85)) {
+      return { model: LUNA, reasoning_effort: 'low', reason: 'simple' };
+    }
+    if (tier.choice === 'luna_medium' && score(tier, 'luna_medium') >= 0.8) {
+      return { model: LUNA, reasoning_effort: 'medium', reason: 'bounded' };
+    }
+    if (tier.choice === 'sol_low' && score(tier, 'sol_low') >= 0.8) {
+      return { model: SOL, reasoning_effort: 'low', reason: 'focused' };
+    }
   }
-  return { model: SOL, reasoning_effort: effort(SOL), reason: 'default' };
+  return { model: SOL, reasoning_effort: 'high', reason: 'default' };
 }
 
 export function isSolFailureRetry(message) {
@@ -53,7 +58,7 @@ function containsCredential(message) {
 export async function routeSubagent(input, decide = evaluateDecision) {
   const role = typeof input.agent_type === 'string' ? input.agent_type : 'default';
   const message = typeof input.message === 'string' ? input.message : '';
-  const fallback = { model: SOL, reasoning_effort: effort(SOL), reason: 'fallback' };
+  const fallback = { model: SOL, reasoning_effort: 'high', reason: 'fallback' };
   if (!message || message.startsWith('gAAAAA') || containsCredential(message)) return fallback;
   if (isSolFailureRetry(message)) return chooseModel({ tier: {}, exceptional: {} }, { role, solFailed: true });
   try {

@@ -24,6 +24,8 @@ test('installer backs up existing settings, preserves unrelated sections, and is
     const instructions = await readFile(join(home, 'AGENTS.md'), 'utf8');
     assert.match(instructions, /Keep this rule/);
     assert.match(instructions, /src\/route.mjs/);
+    assert.match(instructions, /Luna medium/);
+    assert.match(instructions, /Sol low/);
     const explorer = await readFile(join(home, 'agents', 'explorer.toml'), 'utf8');
     assert.doesNotMatch(explorer, /^model\s*=/m);
     assert.match(explorer, /sandbox_mode = "read-only"/);

@@ -8,16 +8,28 @@ const answer = (choice, confidence, probabilities, exceptional) => ({
 });
 
 test('Sol stays the default for uncertain and review work', () => {
-  assert.equal(chooseModel(answer('luna', 0.7, { luna: 0.9 }, 0.02)).model, SOL);
-  assert.equal(chooseModel(answer('luna', 0.99, { luna: 0.99 }, 0.01), { role: 'reviewer' }).model, SOL);
-  assert.equal(chooseModel(answer('sol', 0.99, { sol: 0.99 }, 0.79)).reasoning_effort, 'high');
+  assert.equal(chooseModel(answer('luna_medium', 0.7, { luna_medium: 0.9 }, 0.02)).model, SOL);
+  assert.equal(chooseModel(answer('sol_low', 0.99, { sol_low: 0.99 }, 0.01), { role: 'reviewer' }).reasoning_effort, 'high');
+  assert.equal(chooseModel(answer('sol_high', 0.99, { sol_high: 0.99 }, 0.79)).reasoning_effort, 'high');
 });
 
-test('Luna low handles very simple tasks; exceptional tasks use Sol ultra', () => {
-  const simple = chooseModel(answer('luna', 0.95, { luna: 0.96 }, 0.04));
+test('Luna low and medium and Sol low handle confident bounded tasks', () => {
+  const simple = chooseModel(answer('luna_low', 0.95, { luna_low: 0.96 }, 0.04));
   assert.equal(simple.model, LUNA);
   assert.equal(simple.reasoning_effort, 'low');
-  const exceptional = chooseModel(answer('sol', 0.65, { sol: 0.77 }, 0.83));
+  assert.deepEqual(chooseModel(answer('luna_medium', 0.94, { luna_medium: 0.92 }, 0.04)), {
+    model: LUNA, reasoning_effort: 'medium', reason: 'bounded',
+  });
+  assert.deepEqual(chooseModel(answer('sol_low', 0.94, { sol_low: 0.91 }, 0.04)), {
+    model: SOL, reasoning_effort: 'low', reason: 'focused',
+  });
+  assert.equal(chooseModel(answer('luna', 0.95, { luna: 0.96 }, 0.04)).reasoning_effort, 'low');
+});
+
+test('uncertain routes use Sol high; exceptional tasks use Sol ultra', () => {
+  assert.equal(chooseModel(answer('sol_low', 0.94, { sol_low: 0.79 }, 0.04)).reasoning_effort, 'high');
+  assert.equal(chooseModel(answer('luna_medium', 0.94, { luna_medium: 0.92 }, 0.2)).reasoning_effort, 'high');
+  const exceptional = chooseModel(answer('sol_high', 0.65, { sol_high: 0.77 }, 0.83));
   assert.equal(exceptional.model, SOL);
   assert.equal(exceptional.reasoning_effort, 'ultra');
 });

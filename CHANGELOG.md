@@ -4,6 +4,17 @@ All notable changes are documented here in Keep a Changelog format.
 
 ## Unreleased
 
+## [0.4.0] - 2026-09-24
+
+### Added
+
+- Route confident, bounded multi-step subagent tasks to Luna medium and short tasks needing Sol judgment to Sol low.
+
+### Changed
+
+- Ask the decision backend to distinguish four model-effort profiles while retaining Sol high as the fallback.
+- Document the new routes and install their guidance in the global Codex instructions.
+
 ## [0.3.1] - 2026-09-24
 
 ### Fixed
