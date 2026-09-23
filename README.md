@@ -2,14 +2,14 @@
 
 [Русская инструкция](README.ru.md)
 
-This repository reproduces my Codex subagent setup with [JevRouter](https://github.com/BillionsBobby/JevRouter). It is meant to be handed to a future Codex session as an instruction: **read this file, clone the repository, run the installer, and verify the result**. The installer modifies only local Codex configuration and creates a backup first. It does not require a server deployment.
+This repository reproduces my Codex subagent setup with [JevRouter](https://github.com/BillionsBobby/JevRouter) or another typed decision engine. It is meant to be handed to a future Codex session as an instruction: **read this file, clone the repository, run the installer, and verify the result**. The installer modifies only local Codex configuration and creates a backup first. It does not require a server deployment.
 
 ## What it installs
 
 | Setting | Value |
 | --- | --- |
 | Normal subagent task or fallback | `gpt-6-sol`, `high` reasoning |
-| Very simple, bounded subagent task | `gpt-6-luna`, `low`, only with strong Jev confidence |
+| Very simple, bounded subagent task | `gpt-6-luna`, `low`, only with strong decider confidence |
 | Exceptional task or verified Sol failure | `gpt-6-sol`, `ultra` |
 
 The installer configures only subagent model defaults, adds a routing section to `~/.codex/AGENTS.md`, and removes fixed models from the `explorer`, `reviewer`, and `worker` role files. It creates those role files when missing. A parent agent routes a short task summary before `spawn_agent`, then passes the selected `model` and `reasoning_effort` explicitly. Review tasks remain on Sol.
@@ -23,7 +23,7 @@ When the user asks you to configure Codex like this repository:
 1. Read this file and the local `AGENTS.md` instructions. Check that the user has not requested different model choices.
 2. Clone the repository into a separate local directory. Do not copy credentials into the clone.
 3. Run the commands below, inspect the dry-run file list, then install. The installer makes timestamped backups before changing files.
-4. Run the doctor command. Report any missing Jev credential or network restriction. Tell the user that existing Codex sessions need a restart to load the new configuration.
+4. Select the decision backend below. Run the doctor command. Report any missing backend configuration or connection failure. Tell the user that existing Codex sessions need a restart to load the new configuration.
 5. Do not claim automatic hook enforcement or measured cost savings. Run an actual subagent smoke test if the current Codex build permits it.
 
 ```sh
@@ -38,11 +38,42 @@ npm run doctor -- --live
 
 The `npm ci` dependency is pinned to a JevRouter commit; npm may use GitHub SSH for that dependency. Node.js 20+ and GitHub access are required. To target a nonstandard Codex profile, pass `--codex-home /absolute/path` to `install.mjs` and `doctor.mjs`, or set `CODEX_HOME`.
 
-## Jev credential
+## Decision backends
 
-The routing command needs one of `TYPESAFE_API_KEY`, `JEV_API_KEY`, or `OPENROUTER_API_KEY` in the **Codex command environment**. Supply it through your existing secret manager or shell environment. Do not write it into this repository, `AGENTS.md`, or `config.toml`. `npm run doctor` reports only whether a credential is present; `npm run doctor -- --live` also checks a real Jev decision without displaying the key.
+`CODEX_ROUTER_DECIDER` selects the decision engine. Set it in the environment inherited by Codex commands. The default is `jev`, preserving existing installations. **Only the decider changes; subagent models are always Codex models.**
 
-The router sends the role and up to 4,000 characters of a sanitized task summary to the Jev provider. Common credential patterns and encrypted messages cause a local Sol fallback. These checks cannot detect every secret. The summary is not stored; `~/.codex/router-decisions.jsonl` stores the chosen model, role, reason, timestamp, and a truncated task hash. If Jev is unavailable, the router returns Sol high. In our tested Codex `read-only` sandbox, outbound Jev access was unavailable, so it also returned Sol. The installer does not relax sandbox or network settings.
+| Value | Integration | Configuration |
+| --- | --- | --- |
+| `jev` (default) | Hosted Jev via JevRouter | `TYPESAFE_API_KEY`, `JEV_API_KEY`, or `OPENROUTER_API_KEY` |
+| `laya` | Local [Laya](https://github.com/NandhaKishorM/laya) server | Default `http://127.0.0.1:8000/v1/systemone`; optional `CODEX_ROUTER_DECIDER_URL` |
+| `http` | Any Jev-compatible `POST /v1/systemone` service | Required `CODEX_ROUTER_DECIDER_URL` |
+| `command` | Any other engine via a local executable adapter | Required `CODEX_ROUTER_DECIDER_COMMAND`; optional `CODEX_ROUTER_DECIDER_ARGS` as a JSON string array |
+
+For `laya` and `http`, `CODEX_ROUTER_DECIDER_API_KEY` adds a bearer token and `CODEX_ROUTER_DECIDER_MODEL` sets the optional request `model`. The `command` adapter receives one JSON request on stdin and must write one Jev-shaped JSON response to stdout. It runs without a shell. The request has `state` and `questions`; the response must contain `answers.tier` (`choice`, `confidence`, `probabilities`) and `answers.exceptional` (`noul`). The router validates the answer using JevRouter's typed helpers. This contract lets other open-source deciders integrate through a small adapter even when they do not speak Jev's HTTP protocol. It does not imply that every project in [awesome-jev](https://github.com/hellogumbo/awesome-jev) implements a compatible classifier out of the box.
+
+Example adapter response:
+
+```json
+{"answers":{"tier":{"type":"choice","choice":"sol","confidence":0.9,"probabilities":{"luna":0.1,"sol":0.9}},"exceptional":{"type":"noul","noul":0.02}}}
+```
+
+For local Laya, install and start its [Jev-compatible HTTP server](https://github.com/NandhaKishorM/laya#self-hosting-http-server-jev-compatible) separately:
+
+```sh
+python3 -m venv .venv-laya
+.venv-laya/bin/python -m pip install 'laya[serve]'
+LAYA_HOST=127.0.0.1 LAYA_DEVICE=cpu .venv-laya/bin/laya-serve
+```
+
+Then, in the environment that launches Codex, set `export CODEX_ROUTER_DECIDER=laya` and run `npm run doctor -- --live`. Keep Laya bound to loopback if the summaries should stay on this machine. Its checkpoints can be downloaded on first use; warm the server before a live check. Laya's checkpoints have finite input limits, so keep routing summaries short. A shell export in `.zshrc` reaches only processes that inherit that shell environment; a GUI-launched Codex process may need its own environment setup.
+
+For a noncompatible engine, configure a local wrapper, for example `CODEX_ROUTER_DECIDER=command`, `CODEX_ROUTER_DECIDER_COMMAND=/absolute/path/to/adapter`, and optionally `CODEX_ROUTER_DECIDER_ARGS='["--model","local"]'`. The wrapper translates the request and returns the typed response. A failed, malformed, or timed-out decision safely selects Sol high.
+
+## Hosted Jev credential and privacy
+
+The default hosted Jev backend needs one of `TYPESAFE_API_KEY`, `JEV_API_KEY`, or `OPENROUTER_API_KEY` in the **Codex command environment**. Supply it through your existing secret manager or shell environment. Do not write it into this repository, `AGENTS.md`, or `config.toml`. `npm run doctor` reports whether the selected backend is configured; `npm run doctor -- --live` checks a real decision without displaying credentials.
+
+The router sends the role and up to 4,000 characters of a task summary to the selected decider. With hosted Jev, that summary leaves the machine; with loopback Laya, it stays local. Common credential patterns and encrypted messages cause a local Sol fallback. These checks cannot detect every secret, so the caller must sanitize the summary. The summary is not stored; `~/.codex/router-decisions.jsonl` stores the chosen model, role, reason, timestamp, and a truncated task hash. If the decider is unavailable, the router returns Sol high. In our tested Codex `read-only` sandbox, outbound Jev access was unavailable, so it also returned Sol. The installer does not relax sandbox or network settings.
 
 ## Direct routing and retry
 
@@ -51,7 +82,7 @@ printf '%s\n' 'Find the definition of calculateTotal and report its path.' \
   | node src/route.mjs --role=explorer
 ```
 
-The command prints JSON with `model`, `reasoning_effort`, and `reason`. Pass the first two fields to `spawn_agent`. Sol `ultra` is selected up front only when Jev reports a sufficiently exceptional task. After a **substantive, observed Sol failure**, start the new routing summary with `[codex-router:sol-failed]` followed by the failure description. The parent agent must verify the failure; this marker is not proof by itself.
+The command prints JSON with `model`, `reasoning_effort`, and `reason`. Pass the first two fields to `spawn_agent`. Sol `ultra` is selected up front only when the decider reports a sufficiently exceptional task. After a **substantive, observed Sol failure**, start the new routing summary with `[codex-router:sol-failed]` followed by the failure description. The parent agent must verify the failure; this marker is not proof by itself.
 
 ## Rollback
 

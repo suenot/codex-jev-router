@@ -1,4 +1,5 @@
-import { evaluate, getChoiceAnswer, getNoulAnswer } from 'jevrouter';
+import { getChoiceAnswer, getNoulAnswer } from 'jevrouter';
+import { evaluateDecision } from './decider.mjs';
 
 export const SOL = 'gpt-6-sol';
 export const LUNA = 'gpt-6-luna';
@@ -49,7 +50,7 @@ function containsCredential(message) {
   return /\b(?:api[_-]?key|secret|password|access[_-]?token)\s*[:=]\s*\S+|\bBearer\s+\S+|\bsk-[A-Za-z0-9_-]{16,}/i.test(message);
 }
 
-export async function routeSubagent(input, decide = evaluate) {
+export async function routeSubagent(input, decide = evaluateDecision) {
   const role = typeof input.agent_type === 'string' ? input.agent_type : 'default';
   const message = typeof input.message === 'string' ? input.message : '';
   const fallback = { model: SOL, reasoning_effort: effort(SOL), reason: 'fallback' };

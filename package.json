@@ -1,12 +1,12 @@
 {
   "name": "codex-jev-router",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "license": "MIT",
   "type": "module",
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "check": "node --check src/router.mjs && node --check src/route.mjs && node --check scripts/install.mjs && node --check scripts/doctor.mjs && npm test",
+    "check": "node --check src/decider.mjs && node --check src/router.mjs && node --check src/route.mjs && node --check scripts/install.mjs && node --check scripts/doctor.mjs && npm test",
     "doctor": "node scripts/doctor.mjs"
   },
   "dependencies": {
