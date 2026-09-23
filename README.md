@@ -2,6 +2,12 @@
 
 [Русская инструкция](README.ru.md)
 
+<p align="center">
+  <img src="assets/subagent-routing-comic.png" alt="A small decider routes a simple lookup to Luna, an ordinary bug to Sol, and a complex task to Sol with deeper reasoning." width="820">
+</p>
+
+One short decision before each subagent gives a simple task to Luna low, ordinary work to Sol high, and exceptional work to Sol ultra.
+
 This repository reproduces my Codex subagent setup with [JevRouter](https://github.com/BillionsBobby/JevRouter) or another typed decision engine. It is meant to be handed to a future Codex session as an instruction: **read this file, clone the repository, run the installer, and verify the result**. The installer modifies only local Codex configuration and creates a backup first. It does not require a server deployment.
 
 ## What it installs
