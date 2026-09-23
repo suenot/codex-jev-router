@@ -1,0 +1,15 @@
+{
+  "name": "codex-jev-router",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "node --check src/router.mjs && node --check src/route.mjs && node --check scripts/install.mjs && node --check scripts/doctor.mjs && npm test",
+    "doctor": "node scripts/doctor.mjs"
+  },
+  "dependencies": {
+    "jevrouter": "git+https://github.com/BillionsBobby/JevRouter.git#f944acb6530621bced023352e2358a63218bf4d9"
+  }
+}
