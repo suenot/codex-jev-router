@@ -10,6 +10,8 @@ One short decision before each subagent selects Luna low or medium, Sol low or h
 
 This repository reproduces my Codex subagent setup with [JevRouter](https://github.com/BillionsBobby/JevRouter) or another typed decision engine. It is meant to be handed to a future Codex session as an instruction: **read this file, clone the repository, run the installer, and verify the result**. The installer modifies only local Codex configuration and creates a backup first. It does not require a server deployment.
 
+The [measured benchmark](BENCHMARK.md) reports one faster route with lower estimated API cost and a reliability failure on Luna low. It does not establish overall token savings.
+
 ## What it installs
 
 | Setting | Value |
@@ -47,7 +49,7 @@ When the user asks you to configure Codex like this repository:
 2. Clone the repository into a separate local directory. Do not copy credentials into the clone.
 3. Run the commands below, inspect the dry-run file list, then install. The installer makes timestamped backups before changing files.
 4. Select the decision backend below. Run the doctor command. Report any missing backend configuration or connection failure. Tell the user that existing Codex sessions need a restart to load the new configuration.
-5. Do not claim automatic hook enforcement or measured cost savings. Run an actual subagent smoke test if the current Codex build permits it.
+5. Do not claim automatic hook enforcement or guaranteed savings. Read the benchmark's accuracy and token results before making performance claims. Run an actual subagent smoke test if the current Codex build permits it.
 
 ```sh
 gh repo clone suenot/codex-jev-router
