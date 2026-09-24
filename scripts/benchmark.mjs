@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { access, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
+import { homedir, tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 import { routeSubagent, SOL } from '../src/router.mjs';
 import { deciderConfig, evaluateDecision } from '../src/decider.mjs';
 
@@ -76,16 +76,19 @@ function parseArgs(args) {
   return { repetitions, output };
 }
 
-function runCodex({ cwd, model, reasoning_effort, prompt, evidence }) {
+function runCodex({ cwd, codexHome, model, reasoning_effort, prompt, evidence }) {
   const args = [
-    'exec', '--json', '--ephemeral', '--ignore-user-config', '--skip-git-repo-check',
+    'exec', '--json', '--ephemeral', '--ignore-user-config', '--ignore-rules', '--skip-git-repo-check',
     '-s', 'read-only', '-C', cwd, '-m', model,
     '-c', `model_reasoning_effort=${reasoning_effort}`,
     `All evidence for this task is supplied below. Do not call tools, edit files, or delegate. ${prompt}\n\n${evidence}`,
   ];
   return new Promise((resolve, reject) => {
     const start = performance.now();
-    const child = spawn('codex', args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn('codex', args, {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, CODEX_HOME: codexHome },
+    });
     let stdout = '';
     let stderr = '';
     const timer = setTimeout(() => child.kill(), 120_000);
@@ -108,7 +111,16 @@ function runCodex({ cwd, model, reasoning_effort, prompt, evidence }) {
 async function main() {
   const { repetitions, output } = parseArgs(process.argv.slice(2));
   const fixture = await mkdtemp(join(tmpdir(), 'codex-router-benchmark-'));
+  const codexHome = await mkdtemp(join(tmpdir(), 'codex-router-clean-home-'));
   try {
+    const activeHome = resolve(process.env.CODEX_HOME || join(homedir(), '.codex'));
+    const authFile = join(activeHome, 'auth.json');
+    try {
+      await access(authFile);
+      await symlink(authFile, join(codexHome, 'auth.json'));
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
     const results = {
       benchmark: 'codex-jev-router synthetic tasks with inline evidence',
       generated_at: new Date().toISOString(),
@@ -116,6 +128,7 @@ async function main() {
       codex_version: '',
       decider_backend: deciderConfig().kind,
       baseline: { model: SOL, reasoning_effort: 'high' },
+      codex_isolation: 'Temporary CODEX_HOME with authentication only; no AGENTS.md or config.toml',
       tasks: [],
     };
     const version = await new Promise((resolve, reject) => {
@@ -142,7 +155,7 @@ async function main() {
         const profiles = repeat % 2 === 1 ? ['baseline', 'routed'] : ['routed', 'baseline'];
         for (const profile of profiles) {
           const selection = profile === 'baseline' ? results.baseline : route;
-          const run = await runCodex({ cwd: fixture, ...selection, prompt: task.prompt, evidence });
+          const run = await runCodex({ cwd: fixture, codexHome, ...selection, prompt: task.prompt, evidence });
           entry.runs.push({
             profile, repeat, model: selection.model, reasoning_effort: selection.reasoning_effort,
             ...(profile === 'routed' ? { route_reason: route.reason, decider_usage, decider_duration_ms } : {}),
@@ -156,7 +169,10 @@ async function main() {
     if (output) await writeFile(output, json);
     else process.stdout.write(json);
   } finally {
-    await rm(fixture, { recursive: true, force: true });
+    await Promise.all([
+      rm(fixture, { recursive: true, force: true }),
+      rm(codexHome, { recursive: true, force: true }),
+    ]);
   }
 }
 

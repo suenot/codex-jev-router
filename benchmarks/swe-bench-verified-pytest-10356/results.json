@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-09-24T11:19:29.452821+00:00",
+  "benchmark": "SWE-bench Verified",
+  "dataset_url": "https://huggingface.co/datasets/SWE-bench/SWE-bench_Verified",
+  "instance_id": "pytest-dev__pytest-10356",
+  "repo": "pytest-dev/pytest",
+  "base_commit": "3c1534944cbd34e8a41bc9e76818018fadefc9a1",
+  "difficulty": "1-4 hours",
+  "codex_version": "codex-cli 0.156.1",
+  "python_version": "Python 3.9.6",
+  "isolation": {
+    "codex_home": "temporary directory containing an auth.json symlink and no AGENTS.md or config.toml",
+    "project_agents_md": "absent from both pytest worktrees",
+    "codex_flags": [
+      "--ephemeral",
+      "--ignore-user-config",
+      "--ignore-rules",
+      "-s workspace-write",
+      "-c approval_policy=never"
+    ],
+    "prompt": "identical for both arms; see prompt.txt",
+    "worktrees": "independent clean checkouts of the same base commit",
+    "dependencies": "matching frozen package versions; each editable install points to its own checkout",
+    "test_patch": "not present during agent runs; applied afterward"
+  },
+  "route": {
+    "decider_backend": "jev",
+    "role": "worker",
+    "task_summary": "Fix SWE-bench Verified pytest issue #10356: markers from both base classes must survive multiple inheritance. Investigate pytest marker collection, implement the fix, and validate with relevant tests.",
+    "model": "gpt-6-sol",
+    "reasoning_effort": "high",
+    "reason": "default",
+    "decider_usage": {
+      "input_tokens": 642,
+      "output_tokens": 71
+    },
+    "decision_duration_ms": 885,
+    "estimated_jev_api_usd": 2.6964e-05
+  },
+  "runs": {
+    "baseline": {
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "exit_code": 0,
+      "wall_ms": 171514,
+      "usage": {
+        "input_tokens": 382786,
+        "cached_input_tokens": 357760,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 5304,
+        "reasoning_output_tokens": 2929
+      },
+      "total_tokens": 388090,
+      "completed_items": {
+        "agent_message": 4,
+        "command_execution": 23,
+        "file_change": 2
+      },
+      "official_test_exit_code": 1,
+      "estimated_codex_api_usd": 0.174644
+    },
+    "routed": {
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "exit_code": 0,
+      "wall_ms": 210005,
+      "usage": {
+        "input_tokens": 454675,
+        "cached_input_tokens": 424832,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 6106,
+        "reasoning_output_tokens": 3477
+      },
+      "total_tokens": 460781,
+      "completed_items": {
+        "agent_message": 4,
+        "command_execution": 23,
+        "file_change": 3
+      },
+      "official_test_exit_code": 1,
+      "estimated_codex_api_usd": 0.2057124
+    }
+  },
+  "verification": {
+    "method": "local pytest with the official SWE-bench test_patch, not the full Docker harness",
+    "test_id": "testing/test_mark.py::test_mark_mro",
+    "test_patch_sha256": "547d6960987bcf7820991b7c56d3c7245275789ab0f1cb352e7d1486d2fe9d79",
+    "base_checkout_test_exit_code": 1,
+    "gold_patch_test_exit_code": 0,
+    "gold_patch_sha256": "99d679e52efb6f3a8e9370d597653996c8866ab086935e187d469dafe86e76a2",
+    "baseline_test_exit_code": 1,
+    "routed_test_exit_code": 1,
+    "failure": "Both agent patches return a generator from get_unpacked_marks; the official test expects a list."
+  },
+  "estimated_api_cost": {
+    "basis": "OpenAI Standard short-context prices and TypeSafe Jev input price, not observed Codex billing",
+    "sol_per_million": {
+      "input": 2,
+      "cached_input": 0.2,
+      "output": 10
+    },
+    "jev_input_per_million": 0.042,
+    "baseline_usd": 0.174644,
+    "routed_including_jev_usd": 0.205739364
+  }
+}

@@ -4,18 +4,23 @@ All notable changes are documented here in Keep a Changelog format.
 
 ## Unreleased
 
+## [0.4.1] - 2026-09-24
+
 ### Added
 
 - Add Simplified and Traditional Chinese setup guides.
 - Add a reproducible Codex/Jev routing benchmark and publish its measured limitations.
+- Add a real SWE-bench Verified task with isolated Codex homes, agent traces, generated patches, and a regression-test verdict.
 
 ### Changed
 
 - Show the benchmark's synthetic inputs and estimated API cost by task, including the percentage difference and calculation method.
+- Label the earlier synthetic comparison as unisolated and withdraw its clean-baseline savings claim.
 
 ### Fixed
 
 - Replace the file-tool-confounded benchmark with controlled inline-evidence results and retain the original runs as diagnostic data.
+- Run future synthetic benchmark sessions with an isolated Codex home so installed global routing instructions cannot enter either arm.
 
 ## [0.4.0] - 2026-09-24
 
