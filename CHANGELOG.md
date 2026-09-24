@@ -4,6 +4,17 @@ All notable changes are documented here in Keep a Changelog format.
 
 ## Unreleased
 
+## [0.6.0] - 2026-09-24
+
+### Added
+
+- Add an optional Codex `UserPromptSubmit` skill suggestion hook with two-stage decider selection and one-skill context injection.
+- Add an installer that backs up Codex settings, preserves existing hooks, and can hide explicitly managed local skills from the native listing.
+
+### Changed
+
+- Document local-only skill selection by default, the explicit hosted opt-in, and the current absence of measured Codex skill-token savings.
+
 ## [0.5.0] - 2026-09-24
 
 ### Added

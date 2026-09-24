@@ -114,6 +114,22 @@ printf '%s\n' 'Find the definition of calculateTotal and report its path.' \
 
 命令輸出包含 `model`、`reasoning_effort` 和 `reason` 的 JSON。將前兩個欄位傳給 `spawn_agent`。只有決策器充分確認任務特別困難時，才會一開始就選擇 Sol `ultra`。在 **Sol 確實出現可觀察的實質性失敗** 後，以 `[codex-router:sol-failed]` 開始新的路由摘要，並說明失敗情況。父代理必須核實失敗；此標記本身不能證明失敗。
 
+## 選用的技能建議
+
+[Claude Code 的 Jev Skill Suggestion 模組](https://www.aitmpl.com/component/mods/productivity/jev-skill-suggestion)依賴 Claude 專用掛鉤。本儲存庫提供 Codex `UserPromptSubmit` 掛鉤：先依 `SKILL.md` 描述排序，再檢查最多三個候選的說明，每輪最多加入一個技能。[Codex 本身已按需載入完整技能說明](https://learn.chatgpt.com/docs/build-skills)；只啟用建議不會移除初始的技能名稱與描述清單。
+
+指定本機技能目錄。`--hide-skills` 會在 Codex 原生目錄中停用這些技能，由掛鉤按需加入一個，從而省去它們在初始上下文中的清單。未指定此參數時不會隱藏技能。隱藏模式請使用可信的本機 Laya、Kev 或命令轉接器：
+
+```sh
+export CODEX_ROUTER_DECIDER=laya
+node scripts/install-skill-suggestion.mjs --skills-dir "$HOME/.codex/skills" --skills-dir "$HOME/.agents/skills" --hide-skills --dry-run
+node scripts/install-skill-suggestion.mjs --skills-dir "$HOME/.codex/skills" --skills-dir "$HOME/.agents/skills" --hide-skills
+```
+
+可重複傳入 `--skills-dir`。不使用 `--hide-skills` 時只有建議功能，不節省初始清單的 token。安裝程式會備份修改過的檔案、保留現有掛鉤，並寫入 `~/.codex/skill-suggestion.json`。重新啟動 Codex 後用 `/hooks` 審核並信任新掛鉤；未經信任的掛鉤不會執行。新增技能後須再次執行安裝程式。停用的技能不能透過原生 `$skill` 呼叫；可在請求中寫 `$技能名稱`，由此掛鉤直接載入。外掛與系統技能不受影響。
+
+預設不會將請求傳送給託管決策器。如需主動允許，請在 Codex 環境中以及使用 `--hide-skills` 安裝時設定 `CODEX_ROUTER_SKILL_ALLOW_HOSTED=1`。此時最多 4000 個請求字元、技能描述，以及每個入選技能最多 700 個字元可能傳送給該後端。偵測到常見憑證格式或決策器失敗時，掛鉤會顯示本機備用目錄，該輪不節省清單 token。偵測無法保證找出所有私人資料。此選用模式尚未測量 Codex 的 token 節省或技能選擇準確率。
+
 ## 復原
 
 每次安裝都會產生一份清單，並將每個將被修改的現有檔案複製到 `~/.codex/backups/codex-jev-router/<timestamp>/`。只還原清單列出的檔案。如果某檔案標記為 `existed: false`，只有在後續修改不依賴該檔案時才刪除它。對於安裝後的其他修改，應合併而非覆蓋。復原設定後重新啟動 Codex。

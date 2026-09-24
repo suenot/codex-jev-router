@@ -114,6 +114,22 @@ printf '%s\n' 'Find the definition of calculateTotal and report its path.' \
 
 The command prints JSON with `model`, `reasoning_effort`, and `reason`. Pass the first two fields to `spawn_agent`. Sol `ultra` is selected up front only when the decider reports a sufficiently exceptional task. After a **substantive, observed Sol failure**, start the new routing summary with `[codex-router:sol-failed]` followed by the failure description. The parent agent must verify the failure; this marker is not proof by itself.
 
+## Optional skill suggestion
+
+The [Claude Code Jev Skill Suggestion mod](https://www.aitmpl.com/component/mods/productivity/jev-skill-suggestion) uses Claude-specific function hooks. This repository supplies a Codex `UserPromptSubmit` hook instead. It ranks local skills by their `SKILL.md` descriptions, checks up to three candidates against their instructions, and adds at most one matching skill to the turn. [Codex already loads full skill instructions on demand](https://learn.chatgpt.com/docs/build-skills), so suggestion alone does **not** remove its initial list of skill names and descriptions.
+
+Install the hook for an explicit directory of local skills. Add `--hide-skills` to disable those skills in Codex's native catalog and let the hook supply one when relevant. This is the mode that can remove their listing from the initial context; the installer does not hide skills unless asked. Use a trusted local Laya, Kev, or command backend for that mode:
+
+```sh
+export CODEX_ROUTER_DECIDER=laya
+node scripts/install-skill-suggestion.mjs --skills-dir "$HOME/.codex/skills" --skills-dir "$HOME/.agents/skills" --hide-skills --dry-run
+node scripts/install-skill-suggestion.mjs --skills-dir "$HOME/.codex/skills" --skills-dir "$HOME/.agents/skills" --hide-skills
+```
+
+Pass `--skills-dir` more than once to manage additional directories. Without `--hide-skills`, the hook only adds a recommendation; it does not save listing tokens. The installer backs up changed files, preserves existing hooks, and writes `~/.codex/skill-suggestion.json`. Restart Codex and review/trust the new hook with `/hooks`; untrusted hooks are skipped. A new skill requires rerunning the installer. Native `$skill` invocation of a disabled skill is unavailable; include `$skill-name` in the prompt for this hook to load it explicitly. Other skill sources, including plugin and system skills, are unaffected.
+
+The hook does not send prompts to a hosted decider by default. To permit that deliberately, set `CODEX_ROUTER_SKILL_ALLOW_HOSTED=1` in the environment inherited by Codex **and** during installation with `--hide-skills`. Then up to 4,000 prompt characters, skill descriptions, and up to 700 characters from each shortlisted skill can reach that backend. Common credential patterns bypass the decider and expose a local fallback catalog instead. A failed or unavailable decider also exposes that catalog for the turn, so token savings disappear for that turn. The hook cannot guarantee that all private data is detected. We have not measured a Codex token saving or skill-selection accuracy for this optional mode; verify those on your own workload before making a savings claim.
+
 ## Rollback
 
 Each installation writes a manifest and copies every changed existing file to `~/.codex/backups/codex-jev-router/<timestamp>/`. Restore only the files listed in that manifest. For a file marked `existed: false`, remove the installed file only if no later changes depend on it. Merge later edits rather than overwriting them. Restart Codex after restoring configuration.
