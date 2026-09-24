@@ -10,9 +10,9 @@
 
 本仓库使用 [JevRouter](https://github.com/BillionsBobby/JevRouter) 或其他类型化决策引擎，复现我的 Codex 子代理配置。你可以把本仓库交给今后的 Codex 会话，并要求它：**阅读本文、克隆仓库、运行安装程序并验证结果**。安装程序只修改本地 Codex 配置，修改前会创建备份；无需部署服务器。
 
-[独立的基准仓库](https://github.com/suenot/codex-jev-router-benchmarks)保存[完整报告（英文）](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md)、运行脚本、任务数据和跟踪记录。其中包括 Jev 选择 Luna low、Luna medium 和 Sol low 的 Django 源码任务，以及 Luna medium 与独立运行的 Sol high 均在三次重复中通过官方测试的 SWE-bench Verified Django 修复任务。Codex 与 Jev 的令牌分别统计；早期合成结果标为历史数据。
+[独立的基准仓库](https://github.com/suenot/codex-jev-router-benchmarks)保存[完整报告（英文）](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md)、运行脚本、任务数据和跟踪记录。其中包括 Jev 选择 Luna low、Luna medium 和 Sol low 的 Django 源码任务，以及 Luna medium 与独立运行的 Sol high 均在三次重复中通过官方测试的 SWE-bench Verified Django 修复任务。成本估算包含单独计价的 Jev 决策；早期合成结果标为历史数据。
 
-**实测 Codex 令牌变化：**九组 Django 源码任务的配对运行减少 **15.8%**（450,240 → 379,265；两组各 9/9 正确）；同一项限定范围的 Django 修复在三组配对运行中减少 **68.8%**（1,355,801 → 422,815；两组各 3/3 通过官方测试）。这仅是所选任务的结果，不能作为一般任务的节省预测。Jev 决策令牌未计入上述百分比，并在[完整报告](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md#measured-codex-token-change)中单独列出。
+**按 API 定价估算的成本节省：**九组 Django 源码任务的配对运行节省 **71.0%**（$0.214806 → $0.062317；两组各 9/9 正确）；同一项限定范围的 Django 修复在三组配对运行中节省 **98.3%**（$0.555916 → $0.009668；两组各 3/3 通过官方测试）。路由后的总成本已包含 Jev。这是针对所选任务、按 Standard 短上下文 API 定价计算的估算值，并非 Codex 订阅的实际账单，也不能作为一般任务的节省预测。计算方法和限制见[完整报告](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md#estimated-api-cost-savings)。
 
 ## 安装后会配置什么
 

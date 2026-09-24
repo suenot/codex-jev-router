@@ -6,7 +6,7 @@ All notable changes are documented here in Keep a Changelog format.
 
 ### Changed
 
-- State the measured Codex token reductions and sample limits in all setup guides, with Jev decision tokens reported separately in the benchmark repository.
+- Lead with estimated API cost savings, including Jev, and state the pricing assumptions and sample limits in all setup guides.
 
 ## [0.7.1] - 2026-09-25
 
