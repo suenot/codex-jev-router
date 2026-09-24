@@ -8,6 +8,17 @@ Our first file-based experiment had two Luna-low responses saying the files were
 
 The controlled experiment below puts the same labeled file excerpts directly in each task prompt. It asks both models to answer without tools and records their tool-call count. This isolates model selection and Jev overhead from file-tool access. It does **not** test actual file search or a full agent workflow.
 
+## Test data
+
+These four examples were written for this benchmark in [the runner](scripts/benchmark.mjs). They are synthetic: no user repository, production log, or external evaluation dataset was used. The full text sent to Codex is also recorded as `evidence` in the [raw results](benchmarks/results-2026-09-24.json). Jev received each task's short summary; both Codex arms received the same prompt and evidence.
+
+| Task | Evidence supplied to Codex | Expected answer |
+| --- | --- | --- |
+| Function lookup | A short `src/billing.mjs` excerpt with `calculateTotal` defined on line 6 | `src/billing.mjs:6` |
+| Config extraction | Three JSON excerpts: server port `8123`, cache timeout `4500` ms, retry limit `4` | `port=8123 timeout_ms=4500 retry_limit=4` |
+| Contract check | A rule requiring discount before tax and an implementation that subtracts discount after tax | `FAIL` |
+| Cross-file diagnosis | Gateway key `a-17`, worker key `A-17`, two accepted charges, and a note that provider keys are case-sensitive | `KEY_MISMATCH` |
+
 ## Controlled results
 
 Each task ran three times per arm. All **24 answers were correct**, and none of the runs called a tool. Medians include both Codex and Jev tokens and elapsed time for the routed arm.
@@ -21,7 +32,23 @@ Each task ran three times per arm. All **24 answers were correct**, and none of 
 
 Across all 12 paired tasks, the Sol-high baseline used **190,774 tokens** and **82.49 seconds**. Routing used **189,775 Codex tokens** plus **8,373 Jev tokens**, or **198,148 total tokens** and **85.71 seconds**. That is **7,374 more tokens (+3.9%)** and **3.21 more seconds (+3.9%)**. Jev took 0.78–2.07 seconds per decision. The routed lookup was faster, while the other three task types were slower after including the decision.
 
-Using the published [OpenAI standard API rates](https://developers.openai.com/api/docs/pricing) for Sol and Luna and TypeSafe's [Jev input rate](https://typesafe.ai/) of $42 per billion tokens, the **illustrative API price** of all 12 tasks was **$0.1529** for the baseline and **$0.0733** for routing, about **52% lower**. This calculation applies each run's reported cached-input count and output count. It is not a measured Codex subscription charge. Cache hits varied between runs, so the precise amount is not a production forecast; most of the modeled saving comes from routing six tasks to Luna's lower per-token rate.
+## Estimated API cost
+
+The table applies published **Standard, short-context API prices** to the measured token counts. Each task row totals **three runs per arm**; the last row totals all 12 runs. The routed amounts include Jev. Positive percentages mean the routed arm's calculated price was lower; a negative percentage means it was higher.
+
+| Task | Sol-high baseline | Jev route, including decision | Estimated saving |
+| --- | ---: | ---: | ---: |
+| Function lookup, Luna low | $0.03218 | $0.00257 | 92.0% |
+| Config extraction, Luna medium | $0.04906 | $0.00295 | 94.0% |
+| Contract check, Sol low | $0.04633 | $0.04917 | **−6.1%** |
+| Cross-file diagnosis, Sol high | $0.02534 | $0.01860 | 26.6%* |
+| **All 12 tasks** | **$0.15291** | **$0.07329** | **52.1%** |
+
+\* Both diagnosis arms used **Sol high**. Their price difference reflects variation in token usage and cache hits, **not a cheaper model selected by Jev**. The Sol-low contract row also uses the same Sol token prices as its baseline. These small samples cannot isolate the effect of reasoning effort from run-to-run variation.
+
+The calculation uses [OpenAI's published rates](https://developers.openai.com/api/docs/pricing) per million tokens: Sol input **$2**, cached input **$0.20**, output **$10**; Luna input **$0.10**, cached input **$0.01**, output **$0.50**. [TypeSafe publishes](https://typesafe.ai/blog/introducing-system-one-models-and-jev) Jev input at **$0.042 per million tokens** and output at no charge. For each Codex run, the estimate is `(input_tokens − cached_input_tokens) × input rate + cached_input_tokens × cached rate + output_tokens × output rate`, divided by one million; routed runs add `Jev input_tokens × $0.042 / 1,000,000`. All measured cache-write counts were zero. The percentage is `(baseline − routed) / baseline × 100`.
+
+This is an **illustrative API-price estimate**, not a measured Codex subscription charge or production forecast. Cache hits varied between runs. The observed total is about 52% lower mainly because six tasks used Luna's lower per-token rate, despite the routed arm using more total tokens and time.
 
 ## Reproduction
 
