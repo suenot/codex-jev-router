@@ -1,37 +1,41 @@
-# Routing benchmark: 24 Codex runs, 12 Jev decisions
+# Controlled Codex subagent routing benchmark
 
-Measured on 2026-09-24 with `codex-cli 0.156.1`, this is an exploratory benchmark of **subagent model selection**, not a benchmark of Jev choosing tools inside an agent. The baseline uses `gpt-6-sol` at `high` effort for every task. The routed arm asks hosted Jev to select a Codex model and effort before each run. The [raw results](benchmarks/results-2026-09-24.json) and [runner](scripts/benchmark.mjs) are public and reproducible.
+Measured on 2026-09-24 with `codex-cli 0.156.1`: 24 Codex runs and 12 hosted Jev decisions across four synthetic tasks. The [runner](scripts/benchmark.mjs) and [raw results](benchmarks/results-2026-09-24.json) are public. The baseline uses `gpt-6-sol` at `high` effort. The routed arm uses Jev to choose a Codex model and effort before each run.
 
-## Results
+## Correction to the first experiment
 
-Each task was run three times per arm against the same read-only fixture. The table reports correct answers and medians. Routed tokens include both Codex and Jev input/output tokens; routed time includes the Jev decision. A wrong answer is never counted as a saving.
+Our first file-based experiment had two Luna-low responses saying the files were unavailable. It did not establish whether the tool was unavailable to the session or the model failed to use it. Those runs cannot support a model-quality comparison. We [preserve the original data](benchmarks/diagnostic-2026-09-24-file-access.json) as a diagnostic record, but withdraw its accuracy, speed, and savings claims. Four later Luna-low repetitions in the same CLI mode successfully read a fixture through shell commands; this confirms that the first result was not stable enough to attribute to the model.
+
+The controlled experiment below puts the same labeled file excerpts directly in each task prompt. It asks both models to answer without tools and records their tool-call count. This isolates model selection and Jev overhead from file-tool access. It does **not** test actual file search or a full agent workflow.
+
+## Controlled results
+
+Each task ran three times per arm. All **24 answers were correct**, and none of the runs called a tool. Medians include both Codex and Jev tokens and elapsed time for the routed arm.
 
 | Task | Jev route | Correct, baseline / routed | Median tokens, baseline / routed | Median elapsed, baseline / routed |
 | --- | --- | ---: | ---: | ---: |
-| Exact function lookup | Luna low | 3/3 / **1/3** | 32,051 / 16,380* | 10.1 / 6.2 s* |
-| Three-file config extraction | Luna medium | 3/3 / 3/3 | 32,317 / 32,411 | 15.1 / 11.5 s |
-| One contract check | Sol low | 3/3 / 3/3 | 32,167 / 32,580 | 9.7 / 10.9 s |
-| Cross-file diagnosis | Sol high | 3/3 / 3/3 | 32,439 / 32,909 | 13.1 / 15.4 s |
+| Locate a function in a labeled source excerpt | Luna low | 3/3 / 3/3 | 15,860 / 16,382 | 8.37 / 7.16 s |
+| Extract settings from three labeled JSON excerpts | Luna medium | 3/3 / 3/3 | 15,865 / 16,384 | 6.25 / 6.98 s |
+| Check code against a contract excerpt | Sol low | 3/3 / 3/3 | 15,885 / 16,582 | 6.29 / 6.99 s |
+| Diagnose conflicting identifiers across code and log excerpts | Sol high | 3/3 / 3/3 | 15,903 / 16,596 | 5.00 / 6.27 s |
 
-\* Two Luna-low runs answered that they could not inspect the files. They used about half as many tokens because they did not complete the task. The single correct routed lookup used **32,230** tokens including Jev, compared with the baseline median of **32,051**. Its end-to-end time was **16.1 seconds**, compared with the baseline median of **10.1 seconds**. The benchmark does not establish why those two runs did not inspect the fixture: it records the final answers, not tool availability in the model's context.
+Across all 12 paired tasks, the Sol-high baseline used **190,774 tokens** and **82.49 seconds**. Routing used **189,775 Codex tokens** plus **8,373 Jev tokens**, or **198,148 total tokens** and **85.71 seconds**. That is **7,374 more tokens (+3.9%)** and **3.21 more seconds (+3.9%)**. Jev took 0.78–2.07 seconds per decision. The routed lookup was faster, while the other three task types were slower after including the decision.
 
-Across all 12 tasks, Sol high answered **12/12** correctly and routing answered **10/12** correctly. The raw aggregate token count is lower for routing, but it is confounded by the two failed lookups and one unusually long Sol run. On the three task types with 3/3 routed accuracy, the per-task median total token count was **higher** after adding Jev's usage. This experiment does **not** demonstrate net token savings or a general improvement in agent quality.
+Using the published [OpenAI standard API rates](https://developers.openai.com/api/docs/pricing) for Sol and Luna and TypeSafe's [Jev input rate](https://typesafe.ai/) of $42 per billion tokens, the **illustrative API price** of all 12 tasks was **$0.1529** for the baseline and **$0.0733** for routing, about **52% lower**. This calculation applies each run's reported cached-input count and output count. It is not a measured Codex subscription charge. Cache hits varied between runs, so the precise amount is not a production forecast; most of the modeled saving comes from routing six tasks to Luna's lower per-token rate.
 
-The useful result is narrower: for the three-file extraction, Luna medium retained 3/3 correctness and cut median end-to-end latency by **24%**. Jev took **0.8 to 1.4 seconds** per decision in these runs. Using the published [OpenAI standard API rates](https://developers.openai.com/api/docs/pricing) for Sol and Luna and TypeSafe's [Jev input rate](https://typesafe.ai/) of $42 per billion tokens, the **illustrative API price** of this task averaged about **$0.0223** with Sol high and **$0.00133** with routed Luna medium, including cached-input rates and Jev input. That is about **94% less** under those rates. It is **not** a measured Codex subscription charge, and the sample is too small to predict production costs.
+## Reproduction
 
-## Method
-
-The runner creates a temporary repository with a function lookup, three configuration files, a contract comparison, and a diagnosis that requires comparing gateway code, worker code, and logs. Its fixtures and exact-answer graders are defined in the runner. For each task and repetition, it calls the real `routeSubagent` path using the configured Jev backend, captures the provider's `usage`, and runs two independent `codex exec --json` sessions against the fixture: the Sol-high baseline and the routed profile. The order alternates. Codex sessions use `--ephemeral`, `--ignore-user-config`, and a read-only sandbox. Each run records the `turn.completed.usage` counters, final answer, and wall-clock duration. The raw JSON contains no credentials or private project content.
-
-Run it with a working Codex CLI login and a configured Jev backend:
+The runner defines the synthetic source, config, contract, and log excerpts and exact-answer graders. For each task and repetition, it calls the real `routeSubagent` path using the configured decision backend, captures Jev's `usage`, and runs independent `codex exec --json` sessions for the Sol-high baseline and routed profile. Run order alternates. Codex sessions use `--ephemeral`, `--ignore-user-config`, and a read-only sandbox. The JSON records the answer, tool-call count, `turn.completed.usage`, and wall-clock duration. It contains no credentials or private project data.
 
 ```sh
 npm ci
 node scripts/benchmark.mjs --repetitions 3 --output /tmp/codex-router-benchmark.json
 ```
 
-The `input_tokens` counter includes `cached_input_tokens`; the latter is a subset, not an additional count. Output tokens include model reasoning and other non-visible tokens according to the [OpenAI token-counting documentation](https://developers.openai.com/api/docs/guides/token-counting). The fixture is intentionally small and synthetic, while the Codex run includes the local harness and instructions. Cache hits and tool behavior varied between runs. The result does not evaluate edits, web research, parent-agent detection of bad answers, retries, or other decision backends such as Laya and Kev.
+A working Codex CLI login and hosted Jev configuration are needed to reproduce these numbers. Other decision backends can run through the same script, but their response may omit token usage. Codex's `input_tokens` already includes the `cached_input_tokens` subset; output tokens can include non-visible reasoning, as explained in the [OpenAI token-counting documentation](https://developers.openai.com/api/docs/guides/token-counting).
 
-## What the skeptical argument gets right
+## Interpretation and limits
 
-This router selects a **model for a whole subagent task**. It does not improve task interpretation, tool descriptions, intermediate state, tool arguments, dependency ordering, or recovery after a failed tool call. This benchmark gives no evidence for a broad claim of "faster agent decisions." It shows one bounded workload where selecting Luna medium can lower an estimated model bill and latency, and one simple workload where selecting Luna low harmed reliability. For this configuration, keep Sol high as the safe default and treat Luna-low file searches as unproven until a larger evaluation or an explicit validation-and-retry path exists.
+This benchmark does **not** show a token or end-to-end latency saving from routing on these tasks. It does show lower illustrative API cost at equal accuracy for this small inlined-evidence sample. A more useful claim would require a larger, preregistered mix of real subagent tasks, including edits, web and file tools, retries, answer grading, and the parent agent's work. Three repetitions per task cannot establish a reliable quality difference.
+
+The skeptic's broader point remains open: choosing a model before a subagent starts does not improve task understanding, tool descriptions, intermediate state, arguments, step dependencies, or error recovery inside that subagent. This project measures model selection, not Jev's ability to choose between tools. The controlled run does not support a general claim of “faster agent decisions.”

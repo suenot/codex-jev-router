@@ -9,6 +9,10 @@ All notable changes are documented here in Keep a Changelog format.
 - Add Simplified and Traditional Chinese setup guides.
 - Add a reproducible Codex/Jev routing benchmark and publish its measured limitations.
 
+### Fixed
+
+- Replace the file-tool-confounded benchmark with controlled inline-evidence results and retain the original runs as diagnostic data.
+
 ## [0.4.0] - 2026-09-24
 
 ### Added

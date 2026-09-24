@@ -10,7 +10,7 @@ One short decision before each subagent selects Luna low or medium, Sol low or h
 
 This repository reproduces my Codex subagent setup with [JevRouter](https://github.com/BillionsBobby/JevRouter) or another typed decision engine. It is meant to be handed to a future Codex session as an instruction: **read this file, clone the repository, run the installer, and verify the result**. The installer modifies only local Codex configuration and creates a backup first. It does not require a server deployment.
 
-The [measured benchmark](BENCHMARK.md) reports one faster route with lower estimated API cost and a reliability failure on Luna low. It does not establish overall token savings.
+The [controlled benchmark](BENCHMARK.md) found 12/12 correct answers in each arm, with 3.9% more tokens and elapsed time for routing but lower illustrative API cost. It uses inlined evidence and does not measure file-tool reliability.
 
 ## What it installs
 

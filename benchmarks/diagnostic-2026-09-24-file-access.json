@@ -1,6 +1,6 @@
 {
-  "benchmark": "codex-jev-router synthetic tasks with inline evidence",
-  "generated_at": "2026-09-24T06:51:55.442Z",
+  "benchmark": "codex-jev-router synthetic read-only tasks",
+  "generated_at": "2026-09-24T06:19:02.766Z",
   "repetitions": 3,
   "codex_version": "codex-cli 0.156.1",
   "decider_backend": "jev",
@@ -14,7 +14,6 @@
       "role": "explorer",
       "summary": "Find the named function calculateTotal in one small JavaScript repository and report only its file path and line number.",
       "prompt": "Find the definition of calculateTotal. Return only its relative path and line number in the form path:line.",
-      "evidence": "--- src/billing.mjs ---\nexport const TAX_RATE = 0.2;\n\nexport function roundMoney(value) {\n  return Math.round(value * 100) / 100;\n}\nexport function calculateTotal(subtotal, discount) {\n  const taxed = subtotal * (1 + TAX_RATE);\n  return roundMoney(taxed - discount);\n}\n",
       "runs": [
         {
           "profile": "baseline",
@@ -22,15 +21,14 @@
           "model": "gpt-6-sol",
           "reasoning_effort": "high",
           "usage": {
-            "input_tokens": 15849,
-            "cached_input_tokens": 11776,
+            "input_tokens": 31877,
+            "cached_input_tokens": 22656,
             "cache_write_input_tokens": 0,
-            "output_tokens": 11,
-            "reasoning_output_tokens": 0
+            "output_tokens": 174,
+            "reasoning_output_tokens": 53
           },
           "answer": "src/billing.mjs:6",
-          "tool_calls": 0,
-          "duration_ms": 6434,
+          "duration_ms": 21207,
           "correct": true
         },
         {
@@ -43,17 +41,16 @@
             "input_tokens": 629,
             "output_tokens": 72
           },
-          "decider_duration_ms": 1779,
+          "decider_duration_ms": 883,
           "usage": {
-            "input_tokens": 15670,
-            "cached_input_tokens": 6912,
+            "input_tokens": 31437,
+            "cached_input_tokens": 22016,
             "cache_write_input_tokens": 0,
-            "output_tokens": 11,
+            "output_tokens": 92,
             "reasoning_output_tokens": 0
           },
           "answer": "src/billing.mjs:6",
-          "tool_calls": 0,
-          "duration_ms": 6227,
+          "duration_ms": 15223,
           "correct": true
         },
         {
@@ -66,18 +63,17 @@
             "input_tokens": 629,
             "output_tokens": 72
           },
-          "decider_duration_ms": 1354,
+          "decider_duration_ms": 1064,
           "usage": {
-            "input_tokens": 15670,
+            "input_tokens": 15657,
             "cached_input_tokens": 6912,
             "cache_write_input_tokens": 0,
-            "output_tokens": 11,
+            "output_tokens": 22,
             "reasoning_output_tokens": 0
           },
-          "answer": "src/billing.mjs:6",
-          "tool_calls": 0,
-          "duration_ms": 4628,
-          "correct": true
+          "answer": "I can’t inspect the local fixture because no filesystem-reading tool is available in this session.",
+          "duration_ms": 5150,
+          "correct": false
         },
         {
           "profile": "baseline",
@@ -85,15 +81,14 @@
           "model": "gpt-6-sol",
           "reasoning_effort": "high",
           "usage": {
-            "input_tokens": 15849,
-            "cached_input_tokens": 11776,
+            "input_tokens": 31850,
+            "cached_input_tokens": 27392,
             "cache_write_input_tokens": 0,
-            "output_tokens": 46,
-            "reasoning_output_tokens": 33
+            "output_tokens": 147,
+            "reasoning_output_tokens": 53
           },
           "answer": "src/billing.mjs:6",
-          "tool_calls": 0,
-          "duration_ms": 8368,
+          "duration_ms": 10075,
           "correct": true
         },
         {
@@ -102,15 +97,14 @@
           "model": "gpt-6-sol",
           "reasoning_effort": "high",
           "usage": {
-            "input_tokens": 15849,
-            "cached_input_tokens": 11776,
+            "input_tokens": 32014,
+            "cached_input_tokens": 22784,
             "cache_write_input_tokens": 0,
-            "output_tokens": 11,
+            "output_tokens": 105,
             "reasoning_output_tokens": 0
           },
           "answer": "src/billing.mjs:6",
-          "tool_calls": 0,
-          "duration_ms": 11045,
+          "duration_ms": 9550,
           "correct": true
         },
         {
@@ -123,18 +117,17 @@
             "input_tokens": 629,
             "output_tokens": 72
           },
-          "decider_duration_ms": 2069,
+          "decider_duration_ms": 874,
           "usage": {
-            "input_tokens": 15773,
-            "cached_input_tokens": 11008,
+            "input_tokens": 15657,
+            "cached_input_tokens": 6912,
             "cache_write_input_tokens": 0,
-            "output_tokens": 11,
+            "output_tokens": 15,
             "reasoning_output_tokens": 0
           },
-          "answer": "src/billing.mjs:6",
-          "tool_calls": 0,
-          "duration_ms": 5088,
-          "correct": true
+          "answer": "Fixture files are not accessible in this read-only session.",
+          "duration_ms": 4199,
+          "correct": false
         }
       ]
     },
@@ -143,7 +136,6 @@
       "role": "explorer",
       "summary": "Read three specified configuration files and extract the port, timeout, and retry limit into a short table. No edits or judgment.",
       "prompt": "Read config/server.json, config/cache.json, and config/retry.json. Return only one line in this exact format: port=NUMBER timeout_ms=NUMBER retry_limit=NUMBER.",
-      "evidence": "--- config/server.json ---\n{\"port\":8123,\"host\":\"127.0.0.1\"}\n\n--- config/cache.json ---\n{\"timeout_ms\":4500,\"enabled\":true}\n\n--- config/retry.json ---\n{\"retry_limit\":4,\"backoff_ms\":200}\n",
       "runs": [
         {
           "profile": "baseline",
@@ -151,15 +143,14 @@
           "model": "gpt-6-sol",
           "reasoning_effort": "high",
           "usage": {
-            "input_tokens": 15848,
-            "cached_input_tokens": 7040,
+            "input_tokens": 32105,
+            "cached_input_tokens": 18816,
             "cache_write_input_tokens": 0,
-            "output_tokens": 17,
-            "reasoning_output_tokens": 0
+            "output_tokens": 212,
+            "reasoning_output_tokens": 87
           },
           "answer": "port=8123 timeout_ms=4500 retry_limit=4",
-          "tool_calls": 0,
-          "duration_ms": 5221,
+          "duration_ms": 15494,
           "correct": true
         },
         {
@@ -172,17 +163,16 @@
             "input_tokens": 626,
             "output_tokens": 72
           },
-          "decider_duration_ms": 1170,
+          "decider_duration_ms": 1118,
           "usage": {
-            "input_tokens": 15669,
-            "cached_input_tokens": 6912,
+            "input_tokens": 31451,
+            "cached_input_tokens": 22016,
             "cache_write_input_tokens": 0,
-            "output_tokens": 17,
+            "output_tokens": 64,
             "reasoning_output_tokens": 0
           },
           "answer": "port=8123 timeout_ms=4500 retry_limit=4",
-          "tool_calls": 0,
-          "duration_ms": 6815,
+          "duration_ms": 8637,
           "correct": true
         },
         {
@@ -195,17 +185,16 @@
             "input_tokens": 626,
             "output_tokens": 72
           },
-          "decider_duration_ms": 1599,
+          "decider_duration_ms": 795,
           "usage": {
-            "input_tokens": 15772,
-            "cached_input_tokens": 6912,
+            "input_tokens": 31653,
+            "cached_input_tokens": 22016,
             "cache_write_input_tokens": 0,
-            "output_tokens": 17,
+            "output_tokens": 60,
             "reasoning_output_tokens": 0
           },
           "answer": "port=8123 timeout_ms=4500 retry_limit=4",
-          "tool_calls": 0,
-          "duration_ms": 5383,
+          "duration_ms": 10994,
           "correct": true
         },
         {
@@ -214,15 +203,14 @@
           "model": "gpt-6-sol",
           "reasoning_effort": "high",
           "usage": {
-            "input_tokens": 15848,
-            "cached_input_tokens": 11776,
+            "input_tokens": 32116,
+            "cached_input_tokens": 31232,
             "cache_write_input_tokens": 0,
-            "output_tokens": 17,
-            "reasoning_output_tokens": 0
+            "output_tokens": 222,
+            "reasoning_output_tokens": 89
           },
           "answer": "port=8123 timeout_ms=4500 retry_limit=4",
-          "tool_calls": 0,
-          "duration_ms": 6252,
+          "duration_ms": 15072,
           "correct": true
         },
         {
@@ -231,15 +219,14 @@
           "model": "gpt-6-sol",
           "reasoning_effort": "high",
           "usage": {
-            "input_tokens": 15848,
-            "cached_input_tokens": 7040,
+            "input_tokens": 31875,
+            "cached_input_tokens": 22656,
             "cache_write_input_tokens": 0,
-            "output_tokens": 17,
-            "reasoning_output_tokens": 0
+            "output_tokens": 130,
+            "reasoning_output_tokens": 7
           },
           "answer": "port=8123 timeout_ms=4500 retry_limit=4",
-          "tool_calls": 0,
-          "duration_ms": 10491,
+          "duration_ms": 9261,
           "correct": true
         },
         {
@@ -252,17 +239,16 @@
             "input_tokens": 626,
             "output_tokens": 72
           },
-          "decider_duration_ms": 1905,
+          "decider_duration_ms": 830,
           "usage": {
-            "input_tokens": 15669,
-            "cached_input_tokens": 6912,
+            "input_tokens": 31674,
+            "cached_input_tokens": 18944,
             "cache_write_input_tokens": 0,
-            "output_tokens": 17,
+            "output_tokens": 81,
             "reasoning_output_tokens": 0
           },
           "answer": "port=8123 timeout_ms=4500 retry_limit=4",
-          "tool_calls": 0,
-          "duration_ms": 5006,
+          "duration_ms": 10658,
           "correct": true
         }
       ]
@@ -272,7 +258,6 @@
       "role": "default",
       "summary": "Check one specific claim against two named local files, decide true or false, and return only a short verdict. No broad investigation.",
       "prompt": "The claim is \"calculateTotal applies the discount before tax.\" Check CONTRACT.md and src/billing.mjs. Return only PASS if the claim is true or FAIL if false.",
-      "evidence": "--- CONTRACT.md ---\nA discount must be subtracted from the subtotal before tax is applied.\n\n--- src/billing.mjs ---\nexport const TAX_RATE = 0.2;\n\nexport function roundMoney(value) {\n  return Math.round(value * 100) / 100;\n}\nexport function calculateTotal(subtotal, discount) {\n  const taxed = subtotal * (1 + TAX_RATE);\n  return roundMoney(taxed - discount);\n}\n",
       "runs": [
         {
           "profile": "baseline",
@@ -280,15 +265,14 @@
           "model": "gpt-6-sol",
           "reasoning_effort": "high",
           "usage": {
-            "input_tokens": 15880,
-            "cached_input_tokens": 0,
+            "input_tokens": 31960,
+            "cached_input_tokens": 22656,
             "cache_write_input_tokens": 0,
-            "output_tokens": 5,
-            "reasoning_output_tokens": 0
+            "output_tokens": 167,
+            "reasoning_output_tokens": 89
           },
           "answer": "FAIL",
-          "tool_calls": 0,
-          "duration_ms": 4590,
+          "duration_ms": 9675,
           "correct": true
         },
         {
@@ -301,17 +285,16 @@
             "input_tokens": 626,
             "output_tokens": 71
           },
-          "decider_duration_ms": 1353,
+          "decider_duration_ms": 865,
           "usage": {
-            "input_tokens": 15983,
-            "cached_input_tokens": 7040,
+            "input_tokens": 31867,
+            "cached_input_tokens": 14080,
             "cache_write_input_tokens": 0,
-            "output_tokens": 5,
+            "output_tokens": 74,
             "reasoning_output_tokens": 0
           },
           "answer": "FAIL",
-          "tool_calls": 0,
-          "duration_ms": 5638,
+          "duration_ms": 12400,
           "correct": true
         },
         {
@@ -324,17 +307,16 @@
             "input_tokens": 626,
             "output_tokens": 71
           },
-          "decider_duration_ms": 992,
+          "decider_duration_ms": 792,
           "usage": {
-            "input_tokens": 15880,
-            "cached_input_tokens": 7040,
+            "input_tokens": 31838,
+            "cached_input_tokens": 22656,
             "cache_write_input_tokens": 0,
-            "output_tokens": 5,
+            "output_tokens": 45,
             "reasoning_output_tokens": 0
           },
           "answer": "FAIL",
-          "tool_calls": 0,
-          "duration_ms": 5243,
+          "duration_ms": 8814,
           "correct": true
         },
         {
@@ -343,55 +325,52 @@
           "model": "gpt-6-sol",
           "reasoning_effort": "high",
           "usage": {
-            "input_tokens": 15880,
+            "input_tokens": 32083,
+            "cached_input_tokens": 31488,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 84,
+            "reasoning_output_tokens": 0
+          },
+          "answer": "FAIL",
+          "duration_ms": 8513,
+          "correct": true
+        },
+        {
+          "profile": "baseline",
+          "repeat": 3,
+          "model": "gpt-6-sol",
+          "reasoning_effort": "high",
+          "usage": {
+            "input_tokens": 32165,
+            "cached_input_tokens": 14080,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 166,
+            "reasoning_output_tokens": 65
+          },
+          "answer": "FAIL",
+          "duration_ms": 11305,
+          "correct": true
+        },
+        {
+          "profile": "routed",
+          "repeat": 3,
+          "model": "gpt-6-sol",
+          "reasoning_effort": "low",
+          "route_reason": "focused",
+          "decider_usage": {
+            "input_tokens": 626,
+            "output_tokens": 71
+          },
+          "decider_duration_ms": 927,
+          "usage": {
+            "input_tokens": 31838,
             "cached_input_tokens": 15616,
             "cache_write_input_tokens": 0,
-            "output_tokens": 5,
+            "output_tokens": 45,
             "reasoning_output_tokens": 0
           },
           "answer": "FAIL",
-          "tool_calls": 0,
-          "duration_ms": 6290,
-          "correct": true
-        },
-        {
-          "profile": "baseline",
-          "repeat": 3,
-          "model": "gpt-6-sol",
-          "reasoning_effort": "high",
-          "usage": {
-            "input_tokens": 15983,
-            "cached_input_tokens": 11776,
-            "cache_write_input_tokens": 0,
-            "output_tokens": 5,
-            "reasoning_output_tokens": 0
-          },
-          "answer": "FAIL",
-          "tool_calls": 0,
-          "duration_ms": 8694,
-          "correct": true
-        },
-        {
-          "profile": "routed",
-          "repeat": 3,
-          "model": "gpt-6-sol",
-          "reasoning_effort": "low",
-          "route_reason": "focused",
-          "decider_usage": {
-            "input_tokens": 626,
-            "output_tokens": 71
-          },
-          "decider_duration_ms": 827,
-          "usage": {
-            "input_tokens": 15880,
-            "cached_input_tokens": 11776,
-            "cache_write_input_tokens": 0,
-            "output_tokens": 5,
-            "reasoning_output_tokens": 0
-          },
-          "answer": "FAIL",
-          "tool_calls": 0,
-          "duration_ms": 9496,
+          "duration_ms": 9954,
           "correct": true
         }
       ]
@@ -401,7 +380,6 @@
       "role": "explorer",
       "summary": "Trace an intermittent duplicate charge across gateway and worker code and logs, reconcile conflicting identifiers, and identify the root cause.",
       "prompt": "Investigate why order A-17 was charged twice. Inspect src/gateway.mjs, src/worker.mjs, and logs/checkout.txt. Return only KEY_MISMATCH, TIMEOUT, or UNKNOWN.",
-      "evidence": "--- src/gateway.mjs ---\nexport const requestKey = orderId => orderId.toLowerCase();\n\n--- src/worker.mjs ---\nexport const chargeKey = orderId => orderId;\n\n--- logs/checkout.txt ---\ngateway order=A-17 request_key=a-17 charge=accepted\nworker order=A-17 charge_key=A-17 charge=accepted\nprovider idempotency keys are case-sensitive\n",
       "runs": [
         {
           "profile": "baseline",
@@ -409,15 +387,14 @@
           "model": "gpt-6-sol",
           "reasoning_effort": "high",
           "usage": {
-            "input_tokens": 15985,
-            "cached_input_tokens": 11776,
+            "input_tokens": 32225,
+            "cached_input_tokens": 27520,
             "cache_write_input_tokens": 0,
-            "output_tokens": 18,
-            "reasoning_output_tokens": 8
+            "output_tokens": 191,
+            "reasoning_output_tokens": 54
           },
           "answer": "KEY_MISMATCH",
-          "tool_calls": 0,
-          "duration_ms": 5561,
+          "duration_ms": 10888,
           "correct": true
         },
         {
@@ -430,17 +407,16 @@
             "input_tokens": 624,
             "output_tokens": 71
           },
-          "decider_duration_ms": 781,
+          "decider_duration_ms": 805,
           "usage": {
-            "input_tokens": 15882,
-            "cached_input_tokens": 15616,
+            "input_tokens": 32150,
+            "cached_input_tokens": 31232,
             "cache_write_input_tokens": 0,
-            "output_tokens": 18,
-            "reasoning_output_tokens": 8
+            "output_tokens": 198,
+            "reasoning_output_tokens": 72
           },
           "answer": "KEY_MISMATCH",
-          "tool_calls": 0,
-          "duration_ms": 5920,
+          "duration_ms": 10956,
           "correct": true
         },
         {
@@ -453,34 +429,32 @@
             "input_tokens": 624,
             "output_tokens": 71
           },
-          "decider_duration_ms": 863,
+          "decider_duration_ms": 1409,
           "usage": {
-            "input_tokens": 15882,
-            "cached_input_tokens": 15616,
+            "input_tokens": 32079,
+            "cached_input_tokens": 22656,
             "cache_write_input_tokens": 0,
-            "output_tokens": 27,
+            "output_tokens": 135,
+            "reasoning_output_tokens": 8
+          },
+          "answer": "KEY_MISMATCH",
+          "duration_ms": 18914,
+          "correct": true
+        },
+        {
+          "profile": "baseline",
+          "repeat": 2,
+          "model": "gpt-6-sol",
+          "reasoning_effort": "high",
+          "usage": {
+            "input_tokens": 48690,
+            "cached_input_tokens": 43520,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 283,
             "reasoning_output_tokens": 17
           },
           "answer": "KEY_MISMATCH",
-          "tool_calls": 0,
-          "duration_ms": 5403,
-          "correct": true
-        },
-        {
-          "profile": "baseline",
-          "repeat": 2,
-          "model": "gpt-6-sol",
-          "reasoning_effort": "high",
-          "usage": {
-            "input_tokens": 15882,
-            "cached_input_tokens": 11776,
-            "cache_write_input_tokens": 0,
-            "output_tokens": 18,
-            "reasoning_output_tokens": 8
-          },
-          "answer": "KEY_MISMATCH",
-          "tool_calls": 0,
-          "duration_ms": 4551,
+          "duration_ms": 14005,
           "correct": true
         },
         {
@@ -489,15 +463,14 @@
           "model": "gpt-6-sol",
           "reasoning_effort": "high",
           "usage": {
-            "input_tokens": 15882,
-            "cached_input_tokens": 15744,
+            "input_tokens": 32188,
+            "cached_input_tokens": 22656,
             "cache_write_input_tokens": 0,
-            "output_tokens": 21,
-            "reasoning_output_tokens": 11
+            "output_tokens": 251,
+            "reasoning_output_tokens": 87
           },
           "answer": "KEY_MISMATCH",
-          "tool_calls": 0,
-          "duration_ms": 4997,
+          "duration_ms": 13056,
           "correct": true
         },
         {
@@ -510,17 +483,16 @@
             "input_tokens": 624,
             "output_tokens": 71
           },
-          "decider_duration_ms": 819,
+          "decider_duration_ms": 1075,
           "usage": {
-            "input_tokens": 15882,
-            "cached_input_tokens": 11776,
+            "input_tokens": 31997,
+            "cached_input_tokens": 14080,
             "cache_write_input_tokens": 0,
-            "output_tokens": 19,
-            "reasoning_output_tokens": 9
+            "output_tokens": 169,
+            "reasoning_output_tokens": 54
           },
           "answer": "KEY_MISMATCH",
-          "tool_calls": 0,
-          "duration_ms": 5347,
+          "duration_ms": 14353,
           "correct": true
         }
       ]
