@@ -10,7 +10,7 @@
 
 本儲存庫使用 [JevRouter](https://github.com/BillionsBobby/JevRouter) 或其他具型別的決策引擎，重現我的 Codex 子代理設定。你可以把本儲存庫交給日後的 Codex 工作階段，要求它：**閱讀本文、複製儲存庫、執行安裝程式並驗證結果**。安裝程式只修改本機 Codex 設定，修改前會建立備份；無須部署伺服器。
 
-[基準報告（英文）](BENCHMARK.md)現在包含一項真實的 SWE-bench Verified Django 任務：獨立執行的 Sol high 與由 Jev 選擇的 Sol high 都通過了官方迴歸測試。先前失敗的 pytest 任務也保留在報告中。Jev 在成功的任務中沒有選擇較便宜的模型，因此這組結果無法證明路由節省成本。先前的合成任務成本數據僅保留作歷史紀錄，因為當時沒有隔離已安裝的全域 `AGENTS.md`。
+[基準報告（英文）](BENCHMARK.md)現在包含真實的 Django 原始碼任務，Jev 分別選擇了 Luna low、Luna medium 與 Sol low。另有一項 SWE-bench Verified Django 修復任務：Luna medium 與獨立執行的 Sol high 在三次重複中都通過官方測試。報告分別統計 Codex 與 Jev 的權杖、估算 API 成本、工具呼叫及小樣本的限制；早期合成結果標為歷史資料。
 
 ## 安裝後會設定什麼
 
@@ -18,7 +18,7 @@
 | --- | --- |
 | 一般子代理任務或備用方案 | `gpt-6-sol`，`high` |
 | 非常簡單且範圍明確的子代理任務 | `gpt-6-luna`，`low`，僅在決策器高度確信時使用 |
-| 步驟不多、清楚且範圍明確的任務 | `gpt-6-luna`，`medium`，僅在決策器高度確信時使用 |
+| 步驟不多、範圍明確的任務或已有明確做法的小修改 | `gpt-6-luna`，`medium`，在決策器有足夠把握時使用 |
 | 需要 Sol 判斷能力的簡短、聚焦任務 | `gpt-6-sol`，`low`，僅在決策器高度確信時使用 |
 | 特別困難的任務或已確認 Sol 未能解決的任務 | `gpt-6-sol`，`ultra` |
 

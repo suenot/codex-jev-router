@@ -10,7 +10,7 @@ One short decision before each subagent selects Luna low or medium, Sol low or h
 
 This repository reproduces my Codex subagent setup with [JevRouter](https://github.com/BillionsBobby/JevRouter) or another typed decision engine. It is meant to be handed to a future Codex session as an instruction: **read this file, clone the repository, run the installer, and verify the result**. The installer modifies only local Codex configuration and creates a backup first. It does not require a server deployment.
 
-The [benchmark](BENCHMARK.md) now includes a SWE-bench Verified Django issue that clean Sol high and the Jev-routed Sol high both solved, alongside an earlier failed pytest candidate. Jev did not select a cheaper model for the passing task, so this pair does not demonstrate routing savings. Earlier synthetic cost figures remain historical because their Codex home was not isolated from the installed global instructions.
+The [benchmark](BENCHMARK.md) includes real Django source tasks routed to Luna low, Luna medium, and Sol low, plus a SWE-bench Verified Django fix that Luna medium and clean Sol high each passed in three runs. It reports Codex tokens and Jev tokens separately, estimated API costs, tool traces, official test verdicts, and the limits of the small sample. Earlier synthetic results remain labeled historical.
 
 ## What it installs
 
@@ -18,7 +18,7 @@ The [benchmark](BENCHMARK.md) now includes a SWE-bench Verified Django issue tha
 | --- | --- |
 | Normal subagent task or fallback | `gpt-6-sol`, `high` reasoning |
 | Very simple, bounded subagent task | `gpt-6-luna`, `low`, only with strong decider confidence |
-| Clear, bounded task with a few straightforward steps | `gpt-6-luna`, `medium`, only with strong decider confidence |
+| Clear, bounded task with a few straightforward steps or a prescribed small edit | `gpt-6-luna`, `medium`, when the decider prefers it with sufficient confidence |
 | Short, focused task requiring Sol-level judgment | `gpt-6-sol`, `low`, only with strong decider confidence |
 | Exceptional task or verified Sol failure | `gpt-6-sol`, `ultra` |
 

@@ -1,0 +1,10 @@
+Creating test database for alias 'default'...
+Testing against Django installed in '<BENCHMARK_TMP>/codex-jev-code-cheap/django-16527-luna/django' with up to 12 processes
+Found 5 test(s).
+System check identified no issues (1 silenced).
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.268s
+
+OK
+Destroying test database for alias 'default'...

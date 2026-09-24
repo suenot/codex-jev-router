@@ -1,0 +1,66 @@
+{
+  "instance_id": "django__django-15103",
+  "runs": [
+    {
+      "arm": "baseline",
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "exit_code": 0,
+      "wall_ms": 74912,
+      "usage": {
+        "input_tokens": 229589,
+        "cached_input_tokens": 198144,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2628,
+        "reasoning_output_tokens": 749
+      },
+      "codex_tokens": 232217,
+      "estimated_codex_api_usd": 0.1287988,
+      "official_test_passed": true,
+      "suite_tests": 19,
+      "suite_passed": true,
+      "tool_calls": 16
+    },
+    {
+      "arm": "luna",
+      "model": "gpt-6-luna",
+      "reasoning_effort": "medium",
+      "exit_code": 0,
+      "wall_ms": 82418,
+      "usage": {
+        "input_tokens": 156216,
+        "cached_input_tokens": 143104,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1563,
+        "reasoning_output_tokens": 173
+      },
+      "codex_tokens": 157779,
+      "estimated_codex_api_usd": 0.00352374,
+      "official_test_passed": true,
+      "suite_tests": 19,
+      "suite_passed": true,
+      "tool_calls": 7
+    }
+  ],
+  "route_stability": {
+    "gpt-6-sol-high": 2,
+    "gpt-6-luna-medium": 1
+  },
+  "note": "Experimental Luna medium pair; live router selected Luna medium in only one of three repeated decisions, otherwise Sol high.",
+  "benchmark": "SWE-bench Verified exploratory cheap-profile trial",
+  "dataset_url": "https://huggingface.co/datasets/SWE-bench/SWE-bench_Verified",
+  "base_commit": "dd528cb2cefc0db8b91a7ff0a2bc87305b976597",
+  "difficulty": "15 min - 1 hour",
+  "python_version": "Python 3.9.6",
+  "verification": {
+    "method": "Local official FAIL_TO_PASS tests and related Django tests, not full Docker harness",
+    "test_patch_sha256": "e12231ed9ceb44650d2924c420aa3a87b8f2ee5d4197bd1af9eeba44eef0e577",
+    "gold_patch_sha256": "ca566f4c3bccc161a9c709789a26836368611a67161009bbe62b1acf24961594",
+    "base_test_exit_code": 1,
+    "gold_test_exit_code": 0,
+    "baseline_test_exit_code": 0,
+    "luna_test_exit_code": 0,
+    "related_tests_per_run": 19,
+    "test_file_overlap": "Both agents edited the official test files; after saving their full patches, only those test files were restored to base and the official test patch applied. Production code remained."
+  }
+}

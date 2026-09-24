@@ -1,0 +1,95 @@
+[
+  {
+    "id": "django__django-15103",
+    "repetition": 1,
+    "route": {
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "reason": "default"
+    },
+    "answer": {
+      "tier": {
+        "type": "choice",
+        "choice": "luna_medium",
+        "confidence": 0.6,
+        "probabilities": {
+          "sol_low": 0.06,
+          "luna_low": 0.01,
+          "luna_medium": 0.69,
+          "sol_high": 0.24
+        }
+      },
+      "exceptional": {
+        "type": "noul",
+        "noul": 0.08
+      }
+    },
+    "usage": {
+      "input_tokens": 627,
+      "output_tokens": 72
+    },
+    "duration_ms": 555
+  },
+  {
+    "id": "django__django-15103",
+    "repetition": 2,
+    "route": {
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "reason": "default"
+    },
+    "answer": {
+      "tier": {
+        "type": "choice",
+        "choice": "luna_medium",
+        "confidence": 0.56,
+        "probabilities": {
+          "sol_low": 0.06,
+          "luna_low": 0.01,
+          "sol_high": 0.26,
+          "luna_medium": 0.67
+        }
+      },
+      "exceptional": {
+        "type": "noul",
+        "noul": 0.08
+      }
+    },
+    "usage": {
+      "input_tokens": 627,
+      "output_tokens": 72
+    },
+    "duration_ms": 476
+  },
+  {
+    "id": "django__django-15103",
+    "repetition": 3,
+    "route": {
+      "model": "gpt-6-luna",
+      "reasoning_effort": "medium",
+      "reason": "bounded"
+    },
+    "answer": {
+      "tier": {
+        "type": "choice",
+        "choice": "luna_medium",
+        "confidence": 0.64,
+        "probabilities": {
+          "luna_medium": 0.73,
+          "sol_low": 0.05,
+          "sol_high": 0.22,
+          "luna_low": 0
+        }
+      },
+      "exceptional": {
+        "type": "noul",
+        "noul": 0.08
+      }
+    },
+    "usage": {
+      "input_tokens": 627,
+      "output_tokens": 72
+    },
+    "duration_ms": 468
+  }
+]

@@ -1,5 +1,36 @@
 # Codex subagent routing benchmarks
 
+## Cheaper routes on real Django source tasks
+
+On 2026-09-24, we tested three read-only subagent tasks against the real Django checkout at commit [`9b224579875e30203d079cc2fee83b116d98eb78`](https://github.com/django/django/commit/9b224579875e30203d079cc2fee83b116d98eb78). The tasks required finding a method definition, extracting four setting defaults and one method signature from two files, and checking one claim about `SessionBase.cycle_key()`. Each task ran three times with clean Sol high and three times with the profile selected by Jev. Every Codex run used shell tools to read the repository; **all 18 answers were correct** against the pinned source. The [manifest, answers, traces, and results](benchmarks/django-source-tasks-2026-09-24/) are public. Run `python3 benchmarks/django-source-tasks-2026-09-24/grade.py --source /path/to/django` against that checkout to check the answers and source facts.
+
+| Task | Jev route | Correct, baseline / routed | Codex tokens, baseline / routed | Estimated API price for three runs: baseline / routed Codex + Jev | Estimated saving |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Exact symbol lookup | Luna low | 3/3 / 3/3 | 146,711 / 127,742 | $0.064169 / $0.002899 + $0.000081 | 95.4% |
+| Settings and signature from two files | Luna medium | 3/3 / 3/3 | 134,900 / 133,255 | $0.067515 / $0.003895 + $0.000085 | 94.1% |
+| Check `cycle_key()` behavior | Sol low | 3/3 / 3/3 | 168,629 / 118,268 | $0.083122 / $0.055277 + $0.000081 | 33.4% |
+| **All nine pairs** | | **9/9 / 9/9** | **450,240 / 379,265** | **$0.214806 / $0.062071 + $0.000246** | **71.0%** |
+
+Jev used **5,865 input and 645 output tokens separately** across the nine repeated decisions. Those tokens are **not added to either Codex token total**. Adding the separately measured Jev decision time to each routed Codex run gives 142.570 seconds for the nine routed runs versus 169.331 seconds for the baselines. This is an additive end-to-end estimate: the repeated Jev calls confirmed the same profiles but were measured separately from the Codex sessions. A fourth preselected task, diagnosis from a failing auth log, was routed to Sol high and excluded from this cheaper-route comparison; the [selection audit](benchmarks/routing-selection-audit-2026-09-24.json) records it.
+
+### A code change that Luna medium passed
+
+We also used [`django__django-16527`](https://huggingface.co/datasets/SWE-bench/SWE-bench_Verified), rated **15 minutes to 1 hour** in SWE-bench Verified. The issue specifies that Django admin's `show_save_as_new` control must require add permission. Three clean Sol-high runs and three Luna-medium runs started from the same [Django base commit](https://github.com/django/django/commit/bd366ca2aeffa869b7dbc0b0aa01caea75e6dc31), received the same [issue prompt](benchmarks/swe-bench-verified-django-16527/prompt.txt), edited separate worktrees, and could run tests. The official test patch was hidden until after the agents finished. Its test failed on the base checkout and passed with the reference patch **and all six generated patches**. The related five-test class also passed in all six runs. This is a local official-test check, **not a full SWE-bench Docker-harness grade**.
+
+| Measure, three runs per arm | Clean Sol high | Routed Luna medium |
+| --- | ---: | ---: |
+| Official test and related class | 3/3 passes | 3/3 passes |
+| Codex tokens | 1,355,801 | 422,815 |
+| Median Codex time | 93.494 s | 32.288 s |
+| Estimated Codex API price | $0.555916 | $0.009588 |
+| Jev decision | — | 1,917 input and 216 output tokens; $0.000081; median total time 33.559 s |
+
+For this **one small, explicitly scoped fix**, the illustrative API price including Jev is **98.3% lower** for the routed arm, and the median elapsed time including a separately measured Jev decision is **64.1% lower**. The first Luna run was an experimental profile based on Jev's preferred `luna_medium` choice before the router threshold changed; three later live decisions under the new policy selected Luna medium. The [case directory](benchmarks/swe-bench-verified-django-16527/) includes all six patches and traces, the official test patch, control and reference verdicts, and [machine-readable usage and cost](benchmarks/swe-bench-verified-django-16527/results.json).
+
+Previously, a single confidence threshold kept all six short SWE-bench issue descriptions in the audit on Sol high, even when Jev preferred Luna medium. We lowered **only the Luna-medium gate** to `confidence ≥ 0.60` and `luna_medium probability ≥ 0.70`, while retaining the exception check, reviewer exclusion, and Sol-high fallback. The route for `django__django-16527` selected Luna medium on three of three repeated live decisions. Another public task, [`django__django-15103`](benchmarks/swe-bench-verified-django-15103/), had an experimental Luna-medium solution that passed both official tests, but live routing chose Luna medium on only **one of three** repeats and Sol high on the others; it is **not counted as a stable routed saving**. Both its baseline and Luna patch passed 19 related tests. The [selection audit](benchmarks/routing-selection-audit-2026-09-24.json) preserves the candidate routes before and after the gate change.
+
+Prices apply [OpenAI's Standard short-context rates](https://developers.openai.com/api/docs/pricing): Sol $2 input, $0.20 cached input, $10 output per million tokens; Luna $0.10 input, $0.01 cached input, $0.50 output. Jev is priced separately at [TypeSafe's published $0.042 per million input tokens](https://typesafe.ai/blog/introducing-system-one-models-and-jev), with no output charge. Codex input counts include cached input. The estimate is `(input − cached input) × input rate + cached input × cached rate + output × output rate`, divided by one million, plus Jev input cost where shown. It is **not an observed Codex subscription bill**. All sessions used a temporary `CODEX_HOME` with only an `auth.json` symlink, no global or project `AGENTS.md`, `--ignore-user-config`, `--ignore-rules`, and `--ephemeral`. Read-only tasks used a read-only sandbox; code tasks used separate workspace-write checkouts. These deliberately selected tasks show that cheaper profiles can complete bounded real work; they do **not** establish the success rate or savings across an unselected workload. The code fix is narrowly specified, and three repetitions per arm are too few for a general latency claim.
+
 ## Passing real repository task: Django secret-key rotation
 
 After the failed pytest candidate below, we selected [`django__django-16631`](https://huggingface.co/datasets/SWE-bench/SWE-bench_Verified), another public SWE-bench Verified task rated **1–4 hours**. The bug logs users out when `SECRET_KEY` is rotated even though the previous key is in `SECRET_KEY_FALLBACKS`. Both agents started from Django commit [`9b224579875e30203d079cc2fee83b116d98eb78`](https://github.com/django/django/commit/9b224579875e30203d079cc2fee83b116d98eb78), received the [same issue prompt](benchmarks/swe-bench-verified-django-16631/prompt.txt), and had independent worktrees and matching Python 3.10 dependencies. Neither agent saw the benchmark's test patch or reference solution during its run.
@@ -37,7 +68,7 @@ Jev selected **`gpt-6-sol` at `high` effort** for the routed worker task, the sa
 | Total elapsed time | 171.514 s | 210.890 s |
 | Illustrative Standard API price | $0.174644 | $0.205739 |
 
-The routed run used **18.9% more total tokens**, took **23.0% longer**, and had a **17.8% higher illustrative API price**. Both Codex runs used the same model and effort, so the difference between their Codex token counts and durations is run-to-run variation, not an effect that can be assigned to Jev. The measured Jev decision itself added **885 ms**, **642 input tokens**, **71 output tokens**, and about **$0.000027** at TypeSafe's published input rate.
+The routed run used **18.7% more Codex tokens**, took **23.0% longer**, and had a **17.8% higher illustrative API price**. Jev tokens are reported separately. Both Codex runs used the same model and effort, so the difference between their Codex token counts and durations is run-to-run variation, not an effect that can be assigned to Jev. The measured Jev decision itself added **885 ms**, **642 input tokens**, **71 output tokens**, and about **$0.000027** at TypeSafe's published input rate.
 
 We applied the dataset's [test patch](benchmarks/swe-bench-verified-pytest-10356/test.patch) only after both agents finished. Its `testing/test_mark.py::test_mark_mro` test **failed on the original checkout**, **passed with the dataset's reference patch**, and **failed with both generated patches**. Both agents used a generator where this test expects a list. Both agents reported passing their own tests, which did not catch the API mismatch. This is a local run of the official `FAIL_TO_PASS` test, **not a full SWE-bench Docker-harness grade**. One paired task cannot estimate a general success rate, latency difference, or cost saving.
 
@@ -74,16 +105,16 @@ These four examples were written for this benchmark in [the runner](scripts/benc
 
 ### Recorded results
 
-Each task ran three times per arm. All **24 answers were correct**, and none of the runs called a tool. Medians include both Codex and Jev tokens and elapsed time for the routed arm.
+Each task ran three times per arm. All **24 answers were correct**, and none of the runs called a tool. Token medians below count **Codex only**; Jev tokens are separate. Routed elapsed time includes the Jev decision.
 
 | Task | Jev route | Correct, baseline / routed | Median tokens, baseline / routed | Median elapsed, baseline / routed |
 | --- | --- | ---: | ---: | ---: |
-| Locate a function in a labeled source excerpt | Luna low | 3/3 / 3/3 | 15,860 / 16,382 | 8.37 / 7.16 s |
-| Extract settings from three labeled JSON excerpts | Luna medium | 3/3 / 3/3 | 15,865 / 16,384 | 6.25 / 6.98 s |
-| Check code against a contract excerpt | Sol low | 3/3 / 3/3 | 15,885 / 16,582 | 6.29 / 6.99 s |
-| Diagnose conflicting identifiers across code and log excerpts | Sol high | 3/3 / 3/3 | 15,903 / 16,596 | 5.00 / 6.27 s |
+| Locate a function in a labeled source excerpt | Luna low | 3/3 / 3/3 | 15,860 / 15,681 | 8.37 / 7.16 s |
+| Extract settings from three labeled JSON excerpts | Luna medium | 3/3 / 3/3 | 15,865 / 15,686 | 6.25 / 6.98 s |
+| Check code against a contract excerpt | Sol low | 3/3 / 3/3 | 15,885 / 15,885 | 6.29 / 6.99 s |
+| Diagnose conflicting identifiers across code and log excerpts | Sol high | 3/3 / 3/3 | 15,903 / 15,901 | 5.00 / 6.27 s |
 
-Across all 12 paired tasks, the Sol-high baseline used **190,774 tokens** and **82.49 seconds**. Routing used **189,775 Codex tokens** plus **8,373 Jev tokens**, or **198,148 total tokens** and **85.71 seconds**. That is **7,374 more tokens (+3.9%)** and **3.21 more seconds (+3.9%)**. Jev took 0.78–2.07 seconds per decision. The routed lookup was faster, while the other three task types were slower after including the decision.
+Across all 12 paired tasks, the Sol-high baseline used **190,774 Codex tokens** and **82.49 seconds**. Routing used **189,775 Codex tokens** and **85.71 seconds**, with **8,373 Jev tokens reported separately**. That is **999 fewer Codex tokens (−0.5%)** and **3.21 more seconds (+3.9%)**. Jev took 0.78–2.07 seconds per decision. The routed lookup was faster, while the other three task types were slower after including the decision.
 
 ### Estimated API cost
 
@@ -101,7 +132,7 @@ The table applies published **Standard, short-context API prices** to the measur
 
 The calculation uses [OpenAI's published rates](https://developers.openai.com/api/docs/pricing) per million tokens: Sol input **$2**, cached input **$0.20**, output **$10**; Luna input **$0.10**, cached input **$0.01**, output **$0.50**. [TypeSafe publishes](https://typesafe.ai/blog/introducing-system-one-models-and-jev) Jev input at **$0.042 per million tokens** and output at no charge. For each Codex run, the estimate is `(input_tokens − cached_input_tokens) × input rate + cached_input_tokens × cached rate + output_tokens × output rate`, divided by one million; routed runs add `Jev input_tokens × $0.042 / 1,000,000`. All measured cache-write counts were zero. The percentage is `(baseline − routed) / baseline × 100`.
 
-This is an **illustrative API-price estimate**, not a measured Codex subscription charge or production forecast. Cache hits varied between runs. The observed total is about 52% lower mainly because six tasks used Luna's lower per-token rate, despite the routed arm using more total tokens and time.
+This is an **illustrative API-price estimate**, not a measured Codex subscription charge or production forecast. Cache hits varied between runs. The calculated price is about 52% lower mainly because six tasks used Luna's lower per-token rate; the routed arm took more time.
 
 ### Reproduction
 

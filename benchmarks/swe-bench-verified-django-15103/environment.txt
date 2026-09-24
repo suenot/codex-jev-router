@@ -1,0 +1,6 @@
+SWE-bench Verified django__django-15103
+Base commit: dd528cb2cefc0db8b91a7ff0a2bc87305b976597
+Python: 3.9.6 (Python 3.10 had a pre-existing unrelated strip_tags test failure on this old Django checkout).
+Dependencies: asgiref==3.11.1, sqlparse==0.5.5, typing-extensions==4.16.0
+Official tests: python tests/runtests.py template_tests.filter_tests.test_json_script.JsonScriptTests.test_without_id utils_tests.test_html.TestUtilsHtml.test_json_script_without_id --noinput
+The test.patch was not available to agents during their runs.

@@ -1,0 +1,514 @@
+{
+  "initial_full_issue_routes_before_change": [
+    {
+      "instance_id": "django__django-16485",
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "reason": "default",
+      "decider_usage": {
+        "input_tokens": 680,
+        "output_tokens": 71
+      },
+      "decision_duration_ms": 946
+    },
+    {
+      "instance_id": "django__django-16527",
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "reason": "default",
+      "decider_usage": {
+        "input_tokens": 729,
+        "output_tokens": 71
+      },
+      "decision_duration_ms": 1156
+    },
+    {
+      "instance_id": "django__django-16819",
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "reason": "default",
+      "decider_usage": {
+        "input_tokens": 629,
+        "output_tokens": 71
+      },
+      "decision_duration_ms": 411
+    },
+    {
+      "instance_id": "django__django-16877",
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "reason": "default",
+      "decider_usage": {
+        "input_tokens": 703,
+        "output_tokens": 71
+      },
+      "decision_duration_ms": 327
+    },
+    {
+      "instance_id": "django__django-14559",
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "reason": "default",
+      "decider_usage": {
+        "input_tokens": 728,
+        "output_tokens": 72
+      },
+      "decision_duration_ms": 308
+    },
+    {
+      "instance_id": "django__django-15103",
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "reason": "default",
+      "decider_usage": {
+        "input_tokens": 688,
+        "output_tokens": 72
+      },
+      "decision_duration_ms": 342
+    }
+  ],
+  "short_issue_summary_routes_before_change": [
+    {
+      "id": "django__django-16527",
+      "message": "Fix the Django admin show_save_as_new control in django/contrib/admin/templatetags/admin_modify.py so it requires add permission; add a regression test and run the relevant admin tests.",
+      "route": {
+        "model": "gpt-6-sol",
+        "reasoning_effort": "high",
+        "reason": "default"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "luna_medium",
+          "confidence": 0.67,
+          "probabilities": {
+            "luna_low": 0.01,
+            "luna_medium": 0.75,
+            "sol_low": 0.1,
+            "sol_high": 0.14
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.09
+        }
+      },
+      "usage": {
+        "input_tokens": 639,
+        "output_tokens": 72
+      },
+      "duration_ms": 813
+    },
+    {
+      "id": "django__django-15103",
+      "message": "Make the element_id argument optional for Django json_script in the utility and template filter; add focused tests and run the relevant test modules.",
+      "route": {
+        "model": "gpt-6-sol",
+        "reasoning_effort": "high",
+        "reason": "default"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "luna_medium",
+          "confidence": 0.63,
+          "probabilities": {
+            "sol_low": 0.05,
+            "luna_low": 0.01,
+            "sol_high": 0.22,
+            "luna_medium": 0.72
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.08
+        }
+      },
+      "usage": {
+        "input_tokens": 627,
+        "output_tokens": 72
+      },
+      "duration_ms": 1122
+    },
+    {
+      "id": "django__django-16485",
+      "message": "Fix Django floatformat crashing on zero decimal strings in django/template/defaultfilters.py; add a regression test and run relevant filter tests.",
+      "route": {
+        "model": "gpt-6-sol",
+        "reasoning_effort": "high",
+        "reason": "default"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "luna_medium",
+          "confidence": 0.33,
+          "probabilities": {
+            "luna_medium": 0.5,
+            "luna_low": 0,
+            "sol_high": 0.33,
+            "sol_low": 0.17
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.1
+        }
+      },
+      "usage": {
+        "input_tokens": 631,
+        "output_tokens": 72
+      },
+      "duration_ms": 395
+    },
+    {
+      "id": "django__django-14559",
+      "message": "Make Django QuerySet.bulk_update return the number of rows matched across its update calls; add focused regression tests and run the bulk-update tests.",
+      "route": {
+        "model": "gpt-6-sol",
+        "reasoning_effort": "high",
+        "reason": "default"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "sol_high",
+          "confidence": 0.53,
+          "probabilities": {
+            "luna_low": 0,
+            "sol_low": 0.07,
+            "luna_medium": 0.28,
+            "sol_high": 0.65
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.12
+        }
+      },
+      "usage": {
+        "input_tokens": 628,
+        "output_tokens": 71
+      },
+      "duration_ms": 461
+    }
+  ],
+  "preselected_read_only_tasks": [
+    {
+      "id": "exact-symbol",
+      "message": "In the checked-out Django repository, find the exact definition of AbstractBaseUser.get_session_auth_hash and return its repository-relative path and line number. Read the source; do not guess.",
+      "role": "explorer",
+      "route": {
+        "model": "gpt-6-luna",
+        "reasoning_effort": "low",
+        "reason": "simple"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "luna_low",
+          "confidence": 0.94,
+          "probabilities": {
+            "luna_low": 0.96,
+            "luna_medium": 0.02,
+            "sol_low": 0.02,
+            "sol_high": 0
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.08
+        }
+      },
+      "usage": {
+        "input_tokens": 640,
+        "output_tokens": 72
+      },
+      "duration_ms": 3866
+    },
+    {
+      "id": "bounded-config",
+      "message": "Read django/conf/global_settings.py and django/contrib/auth/base_user.py at the checked-out Django commit. Extract the default values of SESSION_COOKIE_AGE, SESSION_SAVE_EVERY_REQUEST, SECRET_KEY_FALLBACKS, and PASSWORD_RESET_TIMEOUT, and the signature of AbstractBaseUser.get_session_auth_hash. Cite source lines for each answer.",
+      "role": "worker",
+      "route": {
+        "model": "gpt-6-luna",
+        "reasoning_effort": "medium",
+        "reason": "bounded"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "luna_medium",
+          "confidence": 0.99,
+          "probabilities": {
+            "sol_low": 0,
+            "sol_high": 0,
+            "luna_low": 0.01,
+            "luna_medium": 0.99
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.07
+        }
+      },
+      "usage": {
+        "input_tokens": 671,
+        "output_tokens": 72
+      },
+      "duration_ms": 1672
+    },
+    {
+      "id": "cycle-key-claim",
+      "message": "Check one focused claim against the checked-out Django source: SessionBase.cycle_key preserves existing session data while replacing the session key. Answer true or false, with exact source paths and line numbers supporting the answer.",
+      "role": "worker",
+      "route": {
+        "model": "gpt-6-sol",
+        "reasoning_effort": "low",
+        "reason": "focused"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "sol_low",
+          "confidence": 0.94,
+          "probabilities": {
+            "luna_low": 0.04,
+            "sol_low": 0.95,
+            "sol_high": 0,
+            "luna_medium": 0.01
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.09
+        }
+      },
+      "usage": {
+        "input_tokens": 644,
+        "output_tokens": 71
+      },
+      "duration_ms": 335
+    },
+    {
+      "id": "auth-log-diagnosis",
+      "message": "Inspect the attached Django auth regression test failure log and the relevant auth and session source files. Identify the failing test, expected and actual result, and the immediate cause, citing source paths and lines.",
+      "role": "worker",
+      "route": {
+        "model": "gpt-6-sol",
+        "reasoning_effort": "high",
+        "reason": "default"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "luna_medium",
+          "confidence": 0.29,
+          "probabilities": {
+            "sol_low": 0.14,
+            "luna_low": 0,
+            "sol_high": 0.39,
+            "luna_medium": 0.47
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.17
+        }
+      },
+      "usage": {
+        "input_tokens": 639,
+        "output_tokens": 72
+      },
+      "duration_ms": 413
+    }
+  ],
+  "code_issue_routes_after_change": [
+    {
+      "id": "django__django-16527",
+      "repetition": 1,
+      "route": {
+        "model": "gpt-6-luna",
+        "reasoning_effort": "medium",
+        "reason": "bounded"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "luna_medium",
+          "confidence": 0.67,
+          "probabilities": {
+            "luna_low": 0.01,
+            "sol_high": 0.15,
+            "luna_medium": 0.74,
+            "sol_low": 0.1
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.1
+        }
+      },
+      "usage": {
+        "input_tokens": 639,
+        "output_tokens": 72
+      },
+      "duration_ms": 913
+    },
+    {
+      "id": "django__django-16527",
+      "repetition": 2,
+      "route": {
+        "model": "gpt-6-luna",
+        "reasoning_effort": "medium",
+        "reason": "bounded"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "luna_medium",
+          "confidence": 0.64,
+          "probabilities": {
+            "luna_low": 0.01,
+            "sol_high": 0.16,
+            "luna_medium": 0.72,
+            "sol_low": 0.11
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.1
+        }
+      },
+      "usage": {
+        "input_tokens": 639,
+        "output_tokens": 72
+      },
+      "duration_ms": 1271
+    },
+    {
+      "id": "django__django-16527",
+      "repetition": 3,
+      "route": {
+        "model": "gpt-6-luna",
+        "reasoning_effort": "medium",
+        "reason": "bounded"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "luna_medium",
+          "confidence": 0.68,
+          "probabilities": {
+            "sol_high": 0.13,
+            "sol_low": 0.1,
+            "luna_medium": 0.76,
+            "luna_low": 0.01
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.1
+        }
+      },
+      "usage": {
+        "input_tokens": 639,
+        "output_tokens": 72
+      },
+      "duration_ms": 481
+    },
+    {
+      "id": "django__django-15103",
+      "repetition": 1,
+      "route": {
+        "model": "gpt-6-sol",
+        "reasoning_effort": "high",
+        "reason": "default"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "luna_medium",
+          "confidence": 0.6,
+          "probabilities": {
+            "sol_low": 0.06,
+            "luna_low": 0.01,
+            "luna_medium": 0.69,
+            "sol_high": 0.24
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.08
+        }
+      },
+      "usage": {
+        "input_tokens": 627,
+        "output_tokens": 72
+      },
+      "duration_ms": 555
+    },
+    {
+      "id": "django__django-15103",
+      "repetition": 2,
+      "route": {
+        "model": "gpt-6-sol",
+        "reasoning_effort": "high",
+        "reason": "default"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "luna_medium",
+          "confidence": 0.56,
+          "probabilities": {
+            "sol_low": 0.06,
+            "luna_low": 0.01,
+            "sol_high": 0.26,
+            "luna_medium": 0.67
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.08
+        }
+      },
+      "usage": {
+        "input_tokens": 627,
+        "output_tokens": 72
+      },
+      "duration_ms": 476
+    },
+    {
+      "id": "django__django-15103",
+      "repetition": 3,
+      "route": {
+        "model": "gpt-6-luna",
+        "reasoning_effort": "medium",
+        "reason": "bounded"
+      },
+      "answer": {
+        "tier": {
+          "type": "choice",
+          "choice": "luna_medium",
+          "confidence": 0.64,
+          "probabilities": {
+            "luna_medium": 0.73,
+            "sol_low": 0.05,
+            "sol_high": 0.22,
+            "luna_low": 0
+          }
+        },
+        "exceptional": {
+          "type": "noul",
+          "noul": 0.08
+        }
+      },
+      "usage": {
+        "input_tokens": 627,
+        "output_tokens": 72
+      },
+      "duration_ms": 468
+    }
+  ]
+}

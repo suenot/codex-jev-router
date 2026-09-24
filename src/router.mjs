@@ -33,14 +33,16 @@ function score(answer, key) {
 export function chooseModel({ tier, exceptional }, { role = 'default', solFailed = false } = {}) {
   if (solFailed) return { model: SOL, reasoning_effort: 'ultra', reason: 'sol_failed' };
   if (exceptional.noul >= 0.8) return { model: SOL, reasoning_effort: 'ultra', reason: 'exceptional' };
-  if (role !== 'reviewer' && exceptional.noul <= 0.1 && tier.confidence >= 0.75) {
-    if ((tier.choice === 'luna_low' && score(tier, 'luna_low') >= 0.85) || (tier.choice === 'luna' && score(tier, 'luna') >= 0.85)) {
+  if (role !== 'reviewer' && exceptional.noul <= 0.1) {
+    const simple = (tier.choice === 'luna_low' && score(tier, 'luna_low') >= 0.85) ||
+      (tier.choice === 'luna' && score(tier, 'luna') >= 0.85);
+    if (tier.confidence >= 0.75 && simple) {
       return { model: LUNA, reasoning_effort: 'low', reason: 'simple' };
     }
-    if (tier.choice === 'luna_medium' && score(tier, 'luna_medium') >= 0.8) {
+    if (tier.choice === 'luna_medium' && tier.confidence >= 0.6 && score(tier, 'luna_medium') >= 0.7) {
       return { model: LUNA, reasoning_effort: 'medium', reason: 'bounded' };
     }
-    if (tier.choice === 'sol_low' && score(tier, 'sol_low') >= 0.8) {
+    if (tier.choice === 'sol_low' && tier.confidence >= 0.75 && score(tier, 'sol_low') >= 0.8) {
       return { model: SOL, reasoning_effort: 'low', reason: 'focused' };
     }
   }

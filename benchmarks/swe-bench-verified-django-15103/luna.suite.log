@@ -1,0 +1,8 @@
+...................
+----------------------------------------------------------------------
+Ran 19 tests in 0.123s
+
+OK
+Testing against Django installed in '<BENCHMARK_TMP>/codex-jev-code-cheap/django-15103-luna/django'
+Found 19 test(s).
+System check identified no issues (0 silenced).

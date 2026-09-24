@@ -8,7 +8,7 @@ const answer = (choice, confidence, probabilities, exceptional) => ({
 });
 
 test('Sol stays the default for uncertain and review work', () => {
-  assert.equal(chooseModel(answer('luna_medium', 0.7, { luna_medium: 0.9 }, 0.02)).model, SOL);
+  assert.equal(chooseModel(answer('luna_medium', 0.59, { luna_medium: 0.9 }, 0.02)).model, SOL);
   assert.equal(chooseModel(answer('sol_low', 0.99, { sol_low: 0.99 }, 0.01), { role: 'reviewer' }).reasoning_effort, 'high');
   assert.equal(chooseModel(answer('sol_high', 0.99, { sol_high: 0.99 }, 0.79)).reasoning_effort, 'high');
 });
@@ -20,6 +20,9 @@ test('Luna low and medium and Sol low handle confident bounded tasks', () => {
   assert.deepEqual(chooseModel(answer('luna_medium', 0.94, { luna_medium: 0.92 }, 0.04)), {
     model: LUNA, reasoning_effort: 'medium', reason: 'bounded',
   });
+  assert.deepEqual(chooseModel(answer('luna_medium', 0.63, { luna_medium: 0.72 }, 0.08)), {
+    model: LUNA, reasoning_effort: 'medium', reason: 'bounded',
+  });
   assert.deepEqual(chooseModel(answer('sol_low', 0.94, { sol_low: 0.91 }, 0.04)), {
     model: SOL, reasoning_effort: 'low', reason: 'focused',
   });
@@ -28,6 +31,7 @@ test('Luna low and medium and Sol low handle confident bounded tasks', () => {
 
 test('uncertain routes use Sol high; exceptional tasks use Sol ultra', () => {
   assert.equal(chooseModel(answer('sol_low', 0.94, { sol_low: 0.79 }, 0.04)).reasoning_effort, 'high');
+  assert.equal(chooseModel(answer('luna_medium', 0.63, { luna_medium: 0.69 }, 0.04)).reasoning_effort, 'high');
   assert.equal(chooseModel(answer('luna_medium', 0.94, { luna_medium: 0.92 }, 0.2)).reasoning_effort, 'high');
   const exceptional = chooseModel(answer('sol_high', 0.65, { sol_high: 0.77 }, 0.83));
   assert.equal(exceptional.model, SOL);

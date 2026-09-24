@@ -1,0 +1,248 @@
+{
+  "instance_id": "django__django-16527",
+  "runs": [
+    {
+      "repetition": 1,
+      "arm": "baseline",
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "wall_ms": 87302,
+      "usage": {
+        "input_tokens": 431972,
+        "cached_input_tokens": 404224,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2900,
+        "reasoning_output_tokens": 781
+      },
+      "codex_tokens": 434872,
+      "estimated_codex_api_usd": 0.1653408,
+      "tool_calls": 17,
+      "official_test_passed": true
+    },
+    {
+      "repetition": 1,
+      "arm": "routed",
+      "model": "gpt-6-luna",
+      "reasoning_effort": "medium",
+      "wall_ms": 45300,
+      "usage": {
+        "input_tokens": 172480,
+        "cached_input_tokens": 155392,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1150,
+        "reasoning_output_tokens": 307
+      },
+      "codex_tokens": 173630,
+      "estimated_codex_api_usd": 0.00383772,
+      "tool_calls": 7,
+      "official_test_passed": true,
+      "jev_route": {
+        "id": "django__django-16527",
+        "repetition": 1,
+        "route": {
+          "model": "gpt-6-luna",
+          "reasoning_effort": "medium",
+          "reason": "bounded"
+        },
+        "answer": {
+          "tier": {
+            "type": "choice",
+            "choice": "luna_medium",
+            "confidence": 0.67,
+            "probabilities": {
+              "luna_low": 0.01,
+              "sol_high": 0.15,
+              "luna_medium": 0.74,
+              "sol_low": 0.1
+            }
+          },
+          "exceptional": {
+            "type": "noul",
+            "noul": 0.1
+          }
+        },
+        "usage": {
+          "input_tokens": 639,
+          "output_tokens": 72
+        },
+        "duration_ms": 913
+      }
+    },
+    {
+      "repetition": 2,
+      "arm": "baseline",
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "wall_ms": 115295,
+      "usage": {
+        "input_tokens": 542265,
+        "cached_input_tokens": 492032,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 3150,
+        "reasoning_output_tokens": 720
+      },
+      "codex_tokens": 545415,
+      "estimated_codex_api_usd": 0.2303724,
+      "tool_calls": 18,
+      "official_test_passed": true
+    },
+    {
+      "repetition": 2,
+      "arm": "routed",
+      "model": "gpt-6-luna",
+      "reasoning_effort": "medium",
+      "wall_ms": 32288,
+      "usage": {
+        "input_tokens": 158576,
+        "cached_input_tokens": 144384,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 940,
+        "reasoning_output_tokens": 173
+      },
+      "codex_tokens": 159516,
+      "estimated_codex_api_usd": 0.00333304,
+      "tool_calls": 6,
+      "official_test_passed": true,
+      "jev_route": {
+        "id": "django__django-16527",
+        "repetition": 2,
+        "route": {
+          "model": "gpt-6-luna",
+          "reasoning_effort": "medium",
+          "reason": "bounded"
+        },
+        "answer": {
+          "tier": {
+            "type": "choice",
+            "choice": "luna_medium",
+            "confidence": 0.64,
+            "probabilities": {
+              "luna_low": 0.01,
+              "sol_high": 0.16,
+              "luna_medium": 0.72,
+              "sol_low": 0.11
+            }
+          },
+          "exceptional": {
+            "type": "noul",
+            "noul": 0.1
+          }
+        },
+        "usage": {
+          "input_tokens": 639,
+          "output_tokens": 72
+        },
+        "duration_ms": 1271
+      }
+    },
+    {
+      "repetition": 3,
+      "arm": "baseline",
+      "model": "gpt-6-sol",
+      "reasoning_effort": "high",
+      "wall_ms": 93494,
+      "usage": {
+        "input_tokens": 372644,
+        "cached_input_tokens": 340992,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2870,
+        "reasoning_output_tokens": 886
+      },
+      "codex_tokens": 375514,
+      "estimated_codex_api_usd": 0.1602024,
+      "tool_calls": 17,
+      "official_test_passed": true
+    },
+    {
+      "repetition": 3,
+      "arm": "routed",
+      "model": "gpt-6-luna",
+      "reasoning_effort": "medium",
+      "wall_ms": 24814,
+      "usage": {
+        "input_tokens": 88821,
+        "cached_input_tokens": 76544,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 848,
+        "reasoning_output_tokens": 159
+      },
+      "codex_tokens": 89669,
+      "estimated_codex_api_usd": 0.00241714,
+      "tool_calls": 4,
+      "official_test_passed": true,
+      "jev_route": {
+        "id": "django__django-16527",
+        "repetition": 3,
+        "route": {
+          "model": "gpt-6-luna",
+          "reasoning_effort": "medium",
+          "reason": "bounded"
+        },
+        "answer": {
+          "tier": {
+            "type": "choice",
+            "choice": "luna_medium",
+            "confidence": 0.68,
+            "probabilities": {
+              "sol_high": 0.13,
+              "sol_low": 0.1,
+              "luna_medium": 0.76,
+              "luna_low": 0.01
+            }
+          },
+          "exceptional": {
+            "type": "noul",
+            "noul": 0.1
+          }
+        },
+        "usage": {
+          "input_tokens": 639,
+          "output_tokens": 72
+        },
+        "duration_ms": 481
+      }
+    }
+  ],
+  "baseline_cost_usd": 0.5559156,
+  "routed_codex_cost_usd": 0.0095879,
+  "jev_cost_usd_separate": 8.0514e-05,
+  "estimated_saving_pct_including_jev_cost": 98.3,
+  "codex_tokens_baseline": 1355801,
+  "codex_tokens_routed": 422815,
+  "jev_input_tokens_separate": 1917,
+  "jev_output_tokens_separate": 216,
+  "median_ms_baseline": 93494,
+  "median_ms_routed_codex": 32288,
+  "median_ms_routed_plus_jev": 33559,
+  "pricing": {
+    "sol": {
+      "input": 2,
+      "cached_input": 0.2,
+      "output": 10
+    },
+    "luna": {
+      "input": 0.1,
+      "cached_input": 0.01,
+      "output": 0.5
+    },
+    "jev_input": 0.042,
+    "unit": "USD per million tokens, Standard short-context"
+  },
+  "benchmark": "SWE-bench Verified",
+  "dataset_url": "https://huggingface.co/datasets/SWE-bench/SWE-bench_Verified",
+  "base_commit": "bd366ca2aeffa869b7dbc0b0aa01caea75e6dc31",
+  "difficulty": "15 min - 1 hour",
+  "codex_version": "codex-cli 0.156.1",
+  "python_version": "Python 3.10.21",
+  "isolation": "Each run used a clean worktree at the base commit and CODEX_HOME containing only an auth.json symlink; no AGENTS.md or config.toml; --ignore-user-config --ignore-rules --ephemeral; workspace-write sandbox.",
+  "verification": {
+    "method": "Local official FAIL_TO_PASS test and related Django test class, not full SWE-bench Docker harness",
+    "test_patch_sha256": "f6a7281cfea2bd4556de316e62bac92bff2fa78c6ebbb20c1357b226fe197b43",
+    "gold_patch_sha256": "ec7af453a8f6fa122e425dd81aff110fb5296aca4cac987699c967b9125cc9c3",
+    "base_test_exit_code": 1,
+    "gold_test_exit_code": 0,
+    "all_baseline_and_routed_official_tests_passed": true,
+    "related_class_tests_per_run": 5
+  },
+  "route_timing_note": "Jev decisions measured separately from Codex sessions; their durations are added only for estimated end-to-end time. Initial trial used the same profile before the threshold change; repeated live decisions under the new policy selected Luna medium 3/3."
+}

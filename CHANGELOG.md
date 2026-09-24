@@ -4,13 +4,19 @@ All notable changes are documented here in Keep a Changelog format.
 
 ## Unreleased
 
+## [0.5.0] - 2026-09-24
+
 ### Added
 
 - Record a passing SWE-bench Verified Django task with clean Sol-high and Jev-routed runs, official regression verdicts, full auth/session suite results, traces, token usage, and estimated API costs.
+- Measure three real Django source tasks with Luna low, Luna medium, and Sol low routes against clean Sol high, and publish tool traces and graded answers.
+- Measure a bounded Django code fix across three Sol-high and three Luna-medium runs using the official regression test; preserve an unstable second candidate as exploratory data.
 
 ### Changed
 
 - Keep the earlier failed pytest task visible and clarify that same-model run variation does not establish routing savings.
+- Allow Luna medium for bounded tasks when Jev selects it with at least 0.60 confidence and 0.70 probability, while retaining the exceptional-task guard and Sol-high fallback.
+- Report Codex tokens separately from Jev tokens in benchmark comparisons.
 
 ## [0.4.1] - 2026-09-24
 
