@@ -12,6 +12,8 @@
 
 [独立的基准仓库](https://github.com/suenot/codex-jev-router-benchmarks)保存[完整报告（英文）](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md)、运行脚本、任务数据和跟踪记录。其中包括 Jev 选择 Luna low、Luna medium 和 Sol low 的 Django 源码任务，以及 Luna medium 与独立运行的 Sol high 均在三次重复中通过官方测试的 SWE-bench Verified Django 修复任务。Codex 与 Jev 的令牌分别统计；早期合成结果标为历史数据。
 
+**实测 Codex 令牌变化：**九组 Django 源码任务的配对运行减少 **15.8%**（450,240 → 379,265；两组各 9/9 正确）；同一项限定范围的 Django 修复在三组配对运行中减少 **68.8%**（1,355,801 → 422,815；两组各 3/3 通过官方测试）。这仅是所选任务的结果，不能作为一般任务的节省预测。Jev 决策令牌未计入上述百分比，并在[完整报告](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md#measured-codex-token-change)中单独列出。
+
 ## 安装后会配置什么
 
 | 场景 | 模型与推理强度 |

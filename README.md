@@ -12,6 +12,8 @@ This repository reproduces my Codex subagent setup with [JevRouter](https://gith
 
 The [separate benchmark repository](https://github.com/suenot/codex-jev-router-benchmarks) contains the [full report](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md), runner, task data, and traces. It includes real Django source tasks routed to Luna low, Luna medium, and Sol low, plus a SWE-bench Verified Django fix that Luna medium and clean Sol high each passed in three runs. Codex and Jev tokens are reported separately. Earlier synthetic results remain labeled historical.
 
+**Measured Codex token change:** 15.8% fewer tokens across nine paired Django source-task runs (450,240 → 379,265; 9/9 correct in each arm), and 68.8% fewer across three paired runs of one bounded Django fix (1,355,801 → 422,815; 3/3 official tests passed in each arm). These are results for selected tasks, not a general expected saving. Jev decision tokens are excluded from these percentages and reported separately in the [benchmark analysis](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md#measured-codex-token-change).
+
 ## What it installs
 
 | Setting | Value |
