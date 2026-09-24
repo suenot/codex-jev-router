@@ -10,7 +10,7 @@
 
 本儲存庫使用 [JevRouter](https://github.com/BillionsBobby/JevRouter) 或其他具型別的決策引擎，重現我的 Codex 子代理設定。你可以把本儲存庫交給日後的 Codex 工作階段，要求它：**閱讀本文、複製儲存庫、執行安裝程式並驗證結果**。安裝程式只修改本機 Codex 設定，修改前會建立備份；無須部署伺服器。
 
-[基準報告（英文）](BENCHMARK.md)現包含一項真實的 SWE-bench Verified pytest 任務。Jev 選擇了 Sol high，但兩組 Codex 修補程式都未通過該任務的迴歸測試。先前的合成任務成本數據僅保留作歷史紀錄，因為當時沒有隔離已安裝的全域 `AGENTS.md`。
+[基準報告（英文）](BENCHMARK.md)現在包含一項真實的 SWE-bench Verified Django 任務：獨立執行的 Sol high 與由 Jev 選擇的 Sol high 都通過了官方迴歸測試。先前失敗的 pytest 任務也保留在報告中。Jev 在成功的任務中沒有選擇較便宜的模型，因此這組結果無法證明路由節省成本。先前的合成任務成本數據僅保留作歷史紀錄，因為當時沒有隔離已安裝的全域 `AGENTS.md`。
 
 ## 安裝後會設定什麼
 

@@ -10,7 +10,7 @@ One short decision before each subagent selects Luna low or medium, Sol low or h
 
 This repository reproduces my Codex subagent setup with [JevRouter](https://github.com/BillionsBobby/JevRouter) or another typed decision engine. It is meant to be handed to a future Codex session as an instruction: **read this file, clone the repository, run the installer, and verify the result**. The installer modifies only local Codex configuration and creates a backup first. It does not require a server deployment.
 
-The [benchmark](BENCHMARK.md) includes a real SWE-bench Verified pytest issue. Jev selected Sol high, and both Codex patches failed the benchmark's regression test. Earlier synthetic cost figures are historical because their Codex home was not isolated from the installed global instructions.
+The [benchmark](BENCHMARK.md) now includes a SWE-bench Verified Django issue that clean Sol high and the Jev-routed Sol high both solved, alongside an earlier failed pytest candidate. Jev did not select a cheaper model for the passing task, so this pair does not demonstrate routing savings. Earlier synthetic cost figures remain historical because their Codex home was not isolated from the installed global instructions.
 
 ## What it installs
 

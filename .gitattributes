@@ -1,3 +1,6 @@
 benchmarks/swe-bench-verified-pytest-10356/*.patch -whitespace
 benchmarks/swe-bench-verified-pytest-10356/prompt.txt -whitespace
 benchmarks/swe-bench-verified-pytest-10356/*-official-test.log -whitespace
+benchmarks/swe-bench-verified-django-16631/*.patch -whitespace
+benchmarks/swe-bench-verified-django-16631/prompt.txt -whitespace
+benchmarks/swe-bench-verified-django-16631/*.log -whitespace

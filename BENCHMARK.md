@@ -1,6 +1,28 @@
 # Codex subagent routing benchmarks
 
-## Real repository task: SWE-bench Verified
+## Passing real repository task: Django secret-key rotation
+
+After the failed pytest candidate below, we selected [`django__django-16631`](https://huggingface.co/datasets/SWE-bench/SWE-bench_Verified), another public SWE-bench Verified task rated **1–4 hours**. The bug logs users out when `SECRET_KEY` is rotated even though the previous key is in `SECRET_KEY_FALLBACKS`. Both agents started from Django commit [`9b224579875e30203d079cc2fee83b116d98eb78`](https://github.com/django/django/commit/9b224579875e30203d079cc2fee83b116d98eb78), received the [same issue prompt](benchmarks/swe-bench-verified-django-16631/prompt.txt), and had independent worktrees and matching Python 3.10 dependencies. Neither agent saw the benchmark's test patch or reference solution during its run.
+
+The baseline was **clean Codex with `gpt-6-sol` at `high` effort**. It had an isolated `CODEX_HOME` containing only an authentication symlink, so the installed global router instructions could not enter its context. Jev separately chose **Sol high** for the routed worker; that Codex run used the same isolation and prompt. The router did not choose a cheaper model on this task.
+
+| Measure | Clean Sol high | Jev route, including decision |
+| --- | ---: | ---: |
+| Official `FAIL_TO_PASS` test | **Passed** | **Passed** |
+| Auth and session suite | 984 run; suite OK | 984 run; suite OK |
+| Shell tool calls / file-change events | 25 / 7 | 41 / 3 |
+| Codex input + output tokens | 898,994 | 581,761 |
+| Jev input + output tokens | — | 727 |
+| Total elapsed time | 241.180 s | 241.574 s |
+| Illustrative Standard API price | $0.318095 | $0.246697 |
+
+The official test **failed on the base checkout** and **passed with the dataset's reference patch**. It also passed with each generated production patch. Both agents edited the same test file that the official test patch touches. We saved their full patches first, restored only that test file to its base version, and then applied the official test patch; the generated production code stayed in place. The full auth and session suites passed afterward: 984 tests each, including 12 skips and one expected failure. This is a **local run of the official test and related suites, not the full SWE-bench Docker-harness grade**.
+
+The routed run's calculated API price is **22.4% lower** in this pair, while elapsed time is **0.2% longer**. Both arms used the **same model and effort**; the large token and price difference is run-to-run variation and cache behavior, **not evidence that routing saved 22.4%**. The measured Jev decision itself added 1,331 ms, 656 input tokens, 71 output tokens, and about $0.000028 at TypeSafe's published input rate. The estimate uses [OpenAI's Standard short-context Sol rates](https://developers.openai.com/api/docs/models/gpt-6-sol) of $2 per million input tokens, $0.20 per million cached input tokens, and $10 per million output tokens, plus [TypeSafe's published Jev input rate](https://typesafe.ai/blog/introducing-system-one-models-and-jev) of $0.042 per million. It is **not an observed Codex subscription bill**; aggregate CLI usage cannot establish whether every request qualified for short-context pricing.
+
+The [case files](benchmarks/swe-bench-verified-django-16631/) include the exact public issue, prompt, route decision, both generated patches, official test patch, path-sanitized Codex traces, test logs, environment, and [machine-readable results](benchmarks/swe-bench-verified-django-16631/results.json). To reproduce the verdict, check out the recorded Django base commit, install it on Python 3.10, apply an agent's production changes and `test.patch`, then run `python runtests.py auth_tests.test_basic.TestGetUser.test_get_user_fallback_secret --noinput` from `tests/`. The earlier failed pytest candidate is retained below to show the selection sequence. Two selected tasks and one run per arm cannot establish a general success rate or economic benefit.
+
+## Earlier real repository candidate: pytest markers
 
 On 2026-09-24, we ran the public [`pytest-dev__pytest-10356` instance](https://huggingface.co/datasets/SWE-bench/SWE-bench_Verified) from SWE-bench Verified. The dataset rates it a **1–4 hour** fix. The issue asks pytest to preserve markers from both parent classes under multiple inheritance. Both agents started from pytest commit [`3c1534944cbd34e8a41bc9e76818018fadefc9a1`](https://github.com/pytest-dev/pytest/commit/3c1534944cbd34e8a41bc9e76818018fadefc9a1), received the same [benchmark prompt](benchmarks/swe-bench-verified-pytest-10356/prompt.txt), could edit the repository and run tests, and used separate worktrees with matching dependencies. The benchmark's test patch and reference solution were not available to either agent during its run.
 

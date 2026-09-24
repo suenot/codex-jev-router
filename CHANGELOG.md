@@ -4,6 +4,14 @@ All notable changes are documented here in Keep a Changelog format.
 
 ## Unreleased
 
+### Added
+
+- Record a passing SWE-bench Verified Django task with clean Sol-high and Jev-routed runs, official regression verdicts, full auth/session suite results, traces, token usage, and estimated API costs.
+
+### Changed
+
+- Keep the earlier failed pytest task visible and clarify that same-model run variation does not establish routing savings.
+
 ## [0.4.1] - 2026-09-24
 
 ### Added
