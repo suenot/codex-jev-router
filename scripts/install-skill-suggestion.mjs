@@ -2,6 +2,7 @@ import { chmod, copyFile, mkdir, readFile, readdir, realpath, rename, stat, writ
 import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { deciderConfig } from '../src/decider.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 let home = process.env.CODEX_HOME || join(homedir(), '.codex');
@@ -19,8 +20,8 @@ for (let i = 2; i < process.argv.length; i++) {
 home = resolve(home);
 if (!dirs.length) throw new Error('Pass at least one --skills-dir containing local skills.');
 const backend = (process.env.CODEX_ROUTER_DECIDER || 'jev').toLowerCase();
-const endpoint = process.env.CODEX_ROUTER_DECIDER_URL || (backend === 'laya' ? 'http://127.0.0.1:8000' : backend === 'kev' ? 'http://127.0.0.1:8009' : '');
-const localBackend = backend === 'command' || (['laya', 'kev', 'http'].includes(backend) && /^https?:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::|\/|$)/i.test(endpoint));
+const endpoint = deciderConfig().url || '';
+const localBackend = ['command', 'semif', 'jevlike', 'anyjev', 'open-jev-nico'].includes(backend) || (endpoint && /^https?:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::|\/|$)/i.test(endpoint));
 if (hide && !localBackend && process.env.CODEX_ROUTER_SKILL_ALLOW_HOSTED !== '1') {
   throw new Error('Hiding skills requires a local decision backend or CODEX_ROUTER_SKILL_ALLOW_HOSTED=1.');
 }

@@ -65,17 +65,22 @@ npm run doctor -- --live
 
 ## 決策後端
 
-`CODEX_ROUTER_DECIDER` 指定決策引擎。請在 Codex 命令所繼承的環境中設定此變數。預設值為 `jev`，以維持現有安裝的行為。**變更的只有決策器；子代理始終使用 Codex 提供的模型。** `http` 和 `command` 是接入方式，並非 Jev 的替代專案。相容伺服器必須接受文字狀態，以及 `choice` 和 `noul` 兩種問題；只有相同的 URL 路徑並不足夠。
+`CODEX_ROUTER_DECIDER` 指定決策引擎。請在 Codex 命令所繼承的環境中設定此變數。預設值為 `jev`，以維持現有安裝的行為。**變更的只有決策器；子代理始終使用 Codex 提供的模型。** `http` 和 `command` 是接入方式，並非 Jev 的替代專案。相容伺服器必須接受 JSON 狀態，以及 `choice` 和 `noul` 兩種問題；只有相同的 URL 路徑並不足夠。
 
 | 值 | 接入方式 | 設定 |
 | --- | --- | --- |
 | `jev`（預設） | 透過 JevRouter 使用代管 Jev | `TYPESAFE_API_KEY`、`JEV_API_KEY` 或 `OPENROUTER_API_KEY` |
 | `laya` | 本機 [Laya](https://github.com/NandhaKishorM/laya) 伺服器 | 預設 `http://127.0.0.1:8000/v1/systemone`；可選 `CODEX_ROUTER_DECIDER_URL` |
 | `kev` | 本機 [Kev](https://github.com/jaredpalmer/kev) 伺服器 | 預設 `http://127.0.0.1:8009/v1/systemone`；可選 `CODEX_ROUTER_DECIDER_URL` |
+| `simple-jev`、`open-jev-zefan`、`open-jev-dasein` | 回傳 Jev 格式的本機伺服器 | 內建本機位址；可選 `CODEX_ROUTER_DECIDER_URL` |
+| `nanojev`、`minojev`、`mini-jev` | 具有協定轉換的本機伺服器 | 內建本機位址；可選 `CODEX_ROUTER_DECIDER_URL` |
+| `semif`、`jevlike`、`anyjev`、`open-jev-nico` | 本機命令或程式庫轉接器 | 安裝上游執行環境，並設定模型或檢查點變數 |
 | `http` | 任意相容 Jev 的 `POST /v1/systemone` 服務 | 必填 `CODEX_ROUTER_DECIDER_URL` |
 | `command` | 透過本機可執行轉接程式接入其他引擎 | 必填 `CODEX_ROUTER_DECIDER_COMMAND`；可選 JSON 字串陣列 `CODEX_ROUTER_DECIDER_ARGS` |
 
-對於 `laya`、`kev` 和 `http`，`CODEX_ROUTER_DECIDER_API_KEY` 會加入 bearer 權杖，`CODEX_ROUTER_DECIDER_MODEL` 可設定請求中的可選 `model` 欄位。`command` 轉接程式從 stdin 接收一筆 JSON 請求，並向 stdout 輸出一筆符合 Jev 格式的 JSON 回應。它不會透過 shell 啟動。請求包含 `state` 和 `questions`；回應必須包含 `answers.tier`（`choice`、`confidence`、`probabilities`）和 `answers.exceptional`（`noul`）。`tier` 可選擇 `luna_low`、`luna_medium`、`sol_low` 或 `sol_high`；舊版轉接程式回傳的 `luna` 仍會選中 Luna low。路由器使用 JevRouter 的具型別輔助函式驗證答案。即使其他開源決策器不支援 Jev 的 HTTP 協定，也可透過小型轉接程式接入。這不表示 [awesome-jev](https://github.com/hellogumbo/awesome-jev) 中的每個專案都已直接支援此分類任務。
+[十種替代專案的設定說明（英文）](BACKENDS.md)列出實際介面、環境變數及限制。預設仍使用代管 Jev。HTTP 請求預設逾時 15 秒，單次命令轉接器預設逾時 120 秒；可用 `CODEX_ROUTER_DECIDER_TIMEOUT_MS` 調整。其他模型的機率未針對本路由器校準，使用低成本路由前應先以自己的任務驗證。
+
+對 HTTP 後端，`CODEX_ROUTER_DECIDER_API_KEY` 會加入 bearer 權杖，`CODEX_ROUTER_DECIDER_MODEL` 可設定請求中的 `model` 欄位（如果支援）；`simple-jev` 預設使用 `Qwen/Qwen3.5-0.8B`。`command` 轉接程式從 stdin 接收一筆 JSON 請求，並向 stdout 輸出一筆符合 Jev 格式的 JSON 回應。它不會透過 shell 啟動。請求包含 `state` 和 `questions`；回應必須包含 `answers.tier`（`choice`、`confidence`、`probabilities`）和 `answers.exceptional`（`noul`）。`tier` 可選擇 `luna_low`、`luna_medium`、`sol_low` 或 `sol_high`；舊版轉接程式回傳的 `luna` 仍會選中 Luna low。路由器使用 JevRouter 的具型別輔助函式驗證答案。失敗或格式錯誤時會回退至 Sol high。
 
 轉接程式回應範例：
 

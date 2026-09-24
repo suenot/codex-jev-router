@@ -65,17 +65,22 @@ The `npm ci` dependency is pinned to a JevRouter commit; npm may use GitHub SSH 
 
 ## Decision backends
 
-`CODEX_ROUTER_DECIDER` selects the decision engine. Set it in the environment inherited by Codex commands. The default is `jev`, preserving existing installations. **Only the decider changes; subagent models are always Codex models.** `http` and `command` name integration methods, not Jev alternatives. A compatible server must accept a text state plus both `choice` and `noul` questions; a matching URL alone is insufficient.
+`CODEX_ROUTER_DECIDER` selects the decision engine. Set it in the environment inherited by Codex commands. The default is `jev`, preserving existing installations. **Only the decider changes; subagent models are always Codex models.** `http` and `command` name integration methods, not Jev alternatives. A compatible server must accept a JSON state plus both `choice` and `noul` questions; a matching URL alone is insufficient.
 
 | Value | Integration | Configuration |
 | --- | --- | --- |
 | `jev` (default) | Hosted Jev via JevRouter | `TYPESAFE_API_KEY`, `JEV_API_KEY`, or `OPENROUTER_API_KEY` |
 | `laya` | Local [Laya](https://github.com/NandhaKishorM/laya) server | Default `http://127.0.0.1:8000/v1/systemone`; optional `CODEX_ROUTER_DECIDER_URL` |
 | `kev` | Local [Kev](https://github.com/jaredpalmer/kev) server | Default `http://127.0.0.1:8009/v1/systemone`; optional `CODEX_ROUTER_DECIDER_URL` |
+| `simple-jev`, `open-jev-zefan`, `open-jev-dasein` | Local servers with Jev-shaped responses | Built-in loopback URL; optional `CODEX_ROUTER_DECIDER_URL` |
+| `nanojev`, `minojev`, `mini-jev` | Local servers with native protocol conversion | Built-in loopback URL; optional `CODEX_ROUTER_DECIDER_URL` |
+| `semif`, `jevlike`, `anyjev`, `open-jev-nico` | Local CLI or library bridge | Install the upstream runtime and set its required model or checkpoint environment variable |
 | `http` | Any Jev-compatible `POST /v1/systemone` service | Required `CODEX_ROUTER_DECIDER_URL` |
 | `command` | Any other engine via a local executable adapter | Required `CODEX_ROUTER_DECIDER_COMMAND`; optional `CODEX_ROUTER_DECIDER_ARGS` as a JSON string array |
 
-For `laya`, `kev`, and `http`, `CODEX_ROUTER_DECIDER_API_KEY` adds a bearer token and `CODEX_ROUTER_DECIDER_MODEL` sets the optional request `model`. The `command` adapter receives one JSON request on stdin and must write one Jev-shaped JSON response to stdout. It runs without a shell. The request has `state` and `questions`; the response must contain `answers.tier` (`choice`, `confidence`, `probabilities`) and `answers.exceptional` (`noul`). The `tier` choice is `luna_low`, `luna_medium`, `sol_low`, or `sol_high`; older adapter responses using `luna` still select Luna low. The router validates the answer using JevRouter's typed helpers. This contract lets other open-source deciders integrate through a small adapter even when they do not speak Jev's HTTP protocol. It does not imply that every project in [awesome-jev](https://github.com/hellogumbo/awesome-jev) implements a compatible classifier out of the box.
+The [alternative backend guide](BACKENDS.md) lists all ten projects, their actual interfaces, setup variables, and limitations. These presets are optional; the default remains hosted Jev. `CODEX_ROUTER_DECIDER_TIMEOUT_MS` can raise the 15-second HTTP timeout or 120-second one-shot bridge timeout (1,000–600,000 ms). A local model's probabilities are not automatically calibrated for this router's confidence thresholds. Test its decisions on your tasks before relying on cheaper routes.
+
+For HTTP backends, `CODEX_ROUTER_DECIDER_API_KEY` adds a bearer token and `CODEX_ROUTER_DECIDER_MODEL` sets the optional request `model` where supported. `simple-jev` defaults to `Qwen/Qwen3.5-0.8B`; set the model variable if the server serves another ID. The `command` adapter receives one JSON request on stdin and must write one Jev-shaped JSON response to stdout. It runs without a shell. The request has `state` and `questions`; the response must contain `answers.tier` (`choice`, `confidence`, `probabilities`) and `answers.exceptional` (`noul`). The `tier` choice is `luna_low`, `luna_medium`, `sol_low`, or `sol_high`; older adapter responses using `luna` still select Luna low. The router validates the answer using JevRouter's typed helpers. A failed or malformed response selects Sol high.
 
 Example adapter response:
 

@@ -43,7 +43,7 @@ function safeForDecider(prompt, env) {
   const config = deciderConfig(env);
   if (!config.configured) return false;
   if (config.kind === 'jev' && env.CODEX_ROUTER_SKILL_ALLOW_HOSTED !== '1') return false;
-  if (['laya', 'kev', 'http'].includes(config.kind) && !/^https?:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::|\/|$)/i.test(config.url) && env.CODEX_ROUTER_SKILL_ALLOW_HOSTED !== '1') return false;
+  if (config.url && !/^https?:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::|\/|$)/i.test(config.url) && env.CODEX_ROUTER_SKILL_ALLOW_HOSTED !== '1') return false;
   return !/gAAAAA|\b(?:api[_-]?key|secret|password|access[_-]?token)\s*[:=]\s*\S+|\bBearer\s+\S+|\bsk-[A-Za-z0-9_-]{16,}/i.test(prompt);
 }
 

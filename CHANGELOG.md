@@ -4,6 +4,19 @@ All notable changes are documented here in Keep a Changelog format.
 
 ## Unreleased
 
+## [0.7.0] - 2026-09-24
+
+### Added
+
+- Add named local decision backends for SemIf, NanoJev, jevlike, simple-jev, AnyJev, mini-jev, nico-martin/open-jev, minojev, Zefan-Cai/Open-Jev, and daseinlabs/open-jev.
+- Convert NanoJev, minojev, and mini-jev server responses and provide optional one-shot bridges for SemIf, jevlike, AnyJev, and nico-martin/open-jev.
+- Document the upstream interfaces, required models and checkpoints, timeout settings, and validation limits in English and Russian.
+
+### Changed
+
+- Apply local-endpoint privacy checks to every named HTTP backend in the optional skill suggestion hook.
+- Keep all alternative backends opt-in and preserve Sol-high fallback on invalid decisions.
+
 ## [0.6.0] - 2026-09-24
 
 ### Added
