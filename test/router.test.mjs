@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { LUNA, SOL, chooseModel, isSolFailureRetry, routeSubagent } from '../src/router.mjs';
+import { LUNA, SOL, chooseModel, isSolFailureRetry, routeSubagent, routeSubagents } from '../src/router.mjs';
 
 const answer = (choice, confidence, probabilities, exceptional) => ({
   tier: { choice, confidence, probabilities },
@@ -52,4 +52,48 @@ test('provider failure and unreadable task fall back to Sol', async () => {
   assert.equal((await routeSubagent({ message: 'Fix a bug' }, () => { throw new Error('offline'); })).model, SOL);
   assert.equal((await routeSubagent({ message: 'gAAAAAencrypted' }, () => { throw new Error('unexpected provider call'); })).model, SOL);
   assert.equal((await routeSubagent({ message: 'Debug with api_key=example-secret' }, () => { throw new Error('unexpected provider call'); })).model, SOL);
+});
+
+test('batch routes independent eligible tasks with one decision and preserves task order', async () => {
+  let calls = 0;
+  const tasks = [
+    { agent_type: 'explorer', message: 'Find the named function in one file' },
+    { agent_type: 'reviewer', message: 'Review a focused patch' },
+    { agent_type: 'worker', message: '[codex-router:sol-failed] Sol missed a failing case' },
+    { agent_type: 'default', message: 'Check api_key=private-value' },
+  ];
+  const results = await routeSubagents(tasks, async input => {
+    calls++;
+    assert.deepEqual(input.state.tasks.map(task => task.id), [0, 1]);
+    assert.deepEqual(Object.keys(input.questions), ['tier_0', 'exceptional_0', 'tier_1', 'exceptional_1']);
+    return { answers: {
+      tier_0: { type: 'choice', choice: 'luna_low', confidence: 0.94, probabilities: { luna_low: 0.94, luna_medium: 0.02, sol_low: 0.02, sol_high: 0.02 } },
+      exceptional_0: { type: 'noul', noul: 0.02 },
+      tier_1: { type: 'choice', choice: 'sol_low', confidence: 0.95, probabilities: { sol_low: 0.95, sol_high: 0.05 } },
+      exceptional_1: { type: 'noul', noul: 0.01 },
+    } };
+  });
+  assert.equal(calls, 1);
+  assert.deepEqual(results.map(result => result.reasoning_effort), ['low', 'high', 'ultra', 'high']);
+  assert.deepEqual(results.map(result => result.reason), ['simple', 'default', 'sol_failed', 'fallback']);
+});
+
+test('batch falls back only the item with a missing typed answer', async () => {
+  const results = await routeSubagents([
+    { message: 'Exact lookup A' }, { message: 'Exact lookup B' },
+  ], async () => ({ answers: {
+    tier_0: { type: 'choice', choice: 'luna_low', confidence: 0.93, probabilities: { luna_low: 0.93 } },
+    exceptional_0: { type: 'noul', noul: 0.02 },
+    tier_1: { type: 'choice', choice: 'luna_low', confidence: 0.93, probabilities: { luna_low: 0.93 } },
+  } }));
+  assert.deepEqual(results.map(result => result.reason), ['simple', 'fallback']);
+});
+
+test('batch validates size and avoids a provider call for local-only decisions', async () => {
+  await assert.rejects(routeSubagents([]), /1 to 8/);
+  const results = await routeSubagents([
+    { message: 'gAAAAAencrypted' },
+    { message: '[codex-router:sol-failed] Observed failure' },
+  ], () => { throw new Error('unexpected provider call'); });
+  assert.deepEqual(results.map(result => result.reason), ['fallback', 'sol_failed']);
 });

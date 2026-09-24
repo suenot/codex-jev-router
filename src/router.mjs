@@ -1,5 +1,6 @@
 import { getChoiceAnswer, getNoulAnswer } from 'jevrouter';
 import { evaluateDecision } from './decider.mjs';
+import { containsCredential } from './privacy.mjs';
 
 export const SOL = 'gpt-6-sol';
 export const LUNA = 'gpt-6-luna';
@@ -53,26 +54,74 @@ export function isSolFailureRetry(message) {
   return /^\[codex-router:sol-failed\][ \t]+\S/.test(message);
 }
 
-function containsCredential(message) {
-  return /\b(?:api[_-]?key|secret|password|access[_-]?token)\s*[:=]\s*\S+|\bBearer\s+\S+|\bsk-[A-Za-z0-9_-]{16,}/i.test(message);
+const FALLBACK = Object.freeze({ model: SOL, reasoning_effort: 'high', reason: 'fallback' });
+
+function prepareTask(input) {
+  const role = typeof input.agent_type === 'string' ? input.agent_type : 'default';
+  const message = typeof input.message === 'string' ? input.message : '';
+  if (!message || message.startsWith('gAAAAA') || containsCredential(message)) return { role, message, local: FALLBACK };
+  if (isSolFailureRetry(message)) return { role, message, local: chooseModel({ tier: {}, exceptional: {} }, { role, solFailed: true }) };
+  return { role, message };
 }
 
 export async function routeSubagent(input, decide = evaluateDecision) {
-  const role = typeof input.agent_type === 'string' ? input.agent_type : 'default';
-  const message = typeof input.message === 'string' ? input.message : '';
-  const fallback = { model: SOL, reasoning_effort: 'high', reason: 'fallback' };
-  if (!message || message.startsWith('gAAAAA') || containsCredential(message)) return fallback;
-  if (isSolFailureRetry(message)) return chooseModel({ tier: {}, exceptional: {} }, { role, solFailed: true });
+  const task = prepareTask(input);
+  if (task.local) return task.local;
   try {
     const raw = await decide({
-      state: { role, task: message.slice(0, 4000) },
+      state: { role: task.role, task: task.message.slice(0, 4000) },
       questions: QUESTIONS,
     });
     return chooseModel({
       tier: getChoiceAnswer(raw, 'tier'),
       exceptional: getNoulAnswer(raw, 'exceptional'),
-    }, { role });
+    }, { role: task.role });
   } catch {
-    return fallback;
+    return FALLBACK;
   }
+}
+
+export async function routeSubagents(inputs, decide = evaluateDecision) {
+  if (!Array.isArray(inputs) || inputs.length < 1 || inputs.length > 8 || inputs.some(input => !input || typeof input !== 'object' || Array.isArray(input))) {
+    throw new TypeError('Expected an array of 1 to 8 subagent tasks');
+  }
+  if (inputs.length === 1) return [await routeSubagent(inputs[0], decide)];
+
+  const tasks = inputs.map(prepareTask);
+  const results = tasks.map(task => task.local);
+  const pending = tasks.flatMap((task, index) => task.local ? [] : [{ ...task, index }]);
+  if (pending.length === 0) return results;
+  if (pending.length === 1) {
+    results[pending[0].index] = await routeSubagent(inputs[pending[0].index], decide);
+    return results;
+  }
+
+  const questions = {};
+  for (const task of pending) {
+    for (const [key, question] of Object.entries(QUESTIONS)) {
+      questions[`${key}_${task.index}`] = {
+        ...question,
+        instructions: `Answer only for task ${task.index} in state.tasks. ${question.instructions}`,
+      };
+    }
+  }
+  try {
+    const raw = await decide({
+      state: { tasks: pending.map(task => ({ id: task.index, role: task.role, task: task.message.slice(0, 4000) })) },
+      questions,
+    });
+    for (const task of pending) {
+      try {
+        results[task.index] = chooseModel({
+          tier: getChoiceAnswer(raw, `tier_${task.index}`),
+          exceptional: getNoulAnswer(raw, `exceptional_${task.index}`),
+        }, { role: task.role });
+      } catch {
+        results[task.index] = FALLBACK;
+      }
+    }
+  } catch {
+    for (const task of pending) results[task.index] = FALLBACK;
+  }
+  return results;
 }

@@ -4,9 +4,18 @@ All notable changes are documented here in Keep a Changelog format.
 
 ## Unreleased
 
+## [0.8.0] - 2026-09-25
+
+### Added
+
+- Route up to eight planned Codex subagent tasks in one typed decision request, with per-task Sol-high fallback for incomplete answers.
+- Classify 3–24 short records with shared Choice or Noul questions, and mark uncertain or incomplete items for Codex review.
+- Document both optional batch commands and runnable examples in all four setup guides.
+
 ### Changed
 
 - Lead with estimated API cost savings, including Jev, and state the pricing assumptions and sample limits in all setup guides.
+- Reuse one decision logger for single and batch subagent routing.
 
 ## [0.7.1] - 2026-09-25
 

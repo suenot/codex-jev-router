@@ -121,6 +121,26 @@ printf '%s\n' 'Find the definition of calculateTotal and report its path.' \
 
 The command prints JSON with `model`, `reasoning_effort`, and `reason`. Pass the first two fields to `spawn_agent`. Sol `ultra` is selected up front only when the decider reports a sufficiently exceptional task. After a **substantive, observed Sol failure**, start the new routing summary with `[codex-router:sol-failed]` followed by the failure description. The parent agent must verify the failure; this marker is not proof by itself.
 
+## Optional batch decisions
+
+For several **already planned** independent subagents, route up to eight sanitized briefs together:
+
+```sh
+node src/route-batch.mjs < examples/route-batch.json
+```
+
+The JSON array is returned in input order. Each item uses the same confidence rules as single routing; missing or malformed answers fall back to Sol high for that item. A provider failure falls back for the whole pending batch. One-item input uses the original single-task path. This sends one request to the selected backend when at least two tasks need a decision; some local backends may still evaluate the questions internally one by one.
+
+For **repeated, narrow classifications** outside model routing, use the optional typed batch command when at least three short records and one or two `choice` or `noul` questions are ready:
+
+```sh
+node src/decide-batch.mjs < examples/decide-batch.json
+```
+
+It accepts 3–24 `items` with unique `id` and `state`, shared `questions`, and optional `review_threshold` (default `0.8`). It returns typed answers plus `needs_review` per item. Codex should verify only the flagged items and perform the actual work; this command does not execute tasks or call a Codex model. Invalid or missing answers and backend failure are flagged for review. Do not send private records to a hosted backend; use sanitized states or a trusted local backend. Common credential patterns are rejected, but detection is incomplete.
+
+Use the batch path when the decisions are repetitive and the inputs are already available. Asking Jev whether Jev is needed would add a decision call, so this repository uses the number and shape of the prepared items as the gate. We have not measured an end-to-end cost or latency saving for these new batch commands; the [separate benchmark](https://github.com/suenot/codex-jev-router-benchmarks) covers single-task model routing only.
+
 ## Optional skill suggestion
 
 The [Claude Code Jev Skill Suggestion mod](https://www.aitmpl.com/component/mods/productivity/jev-skill-suggestion) uses Claude-specific function hooks. This repository supplies a Codex `UserPromptSubmit` hook instead. It ranks local skills by their `SKILL.md` descriptions, checks up to three candidates against their instructions, and adds at most one matching skill to the turn. [Codex already loads full skill instructions on demand](https://learn.chatgpt.com/docs/build-skills), so suggestion alone does **not** remove its initial list of skill names and descriptions.

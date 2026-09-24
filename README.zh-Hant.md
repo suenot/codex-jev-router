@@ -121,6 +121,26 @@ printf '%s\n' 'Find the definition of calculateTotal and report its path.' \
 
 命令輸出包含 `model`、`reasoning_effort` 和 `reason` 的 JSON。將前兩個欄位傳給 `spawn_agent`。只有決策器充分確認任務特別困難時，才會一開始就選擇 Sol `ultra`。在 **Sol 確實出現可觀察的實質性失敗** 後，以 `[codex-router:sol-failed]` 開始新的路由摘要，並說明失敗情況。父代理必須核實失敗；此標記本身不能證明失敗。
 
+## 選用的批次決策
+
+如果已規劃多個獨立子代理，可以一次評估最多八個已清理的簡短任務：
+
+```sh
+node src/route-batch.mjs < examples/route-batch.json
+```
+
+輸出陣列維持輸入順序。每項沿用單一任務的信心門檻；某項回答缺失或格式錯誤時，只有該項回退至 Sol high。決策器整體失敗時，所有待評估項回退至 Sol high。只有一項時使用原來的單一任務路徑。至少兩項需要評估時，命令只向後端送出一次請求；部分本機後端內部仍可能逐一處理問題。
+
+對於模型路由以外**重複且範圍明確的分類**，準備至少三筆簡短紀錄，以及一至兩個共用的 `choice` 或 `noul` 問題：
+
+```sh
+node src/decide-batch.mjs < examples/decide-batch.json
+```
+
+輸入包含 3–24 個具唯一 `id` 和 `state` 的 `items`、共用的 `questions`，以及可選的 `review_threshold`（預設 `0.8`）。輸出包含具型別的答案和每筆紀錄的 `needs_review`。Codex 只須複核標記的紀錄並完成實際工作；此命令不會執行任務或呼叫 Codex 模型。答案缺失和後端故障也會標記複核。私密紀錄應先清理，或交由可信的本機後端處理，避免傳送到代管服務。常見憑證格式會被拒絕，但檢查無法找出所有秘密。
+
+僅當同類決策和輸入已準備好時才使用批次命令。先問 Jev「是否需要 Jev」本身就增加一次呼叫，因此這裡根據紀錄數量與問題類型決定是否使用。目前尚未量測這些新命令的端到端成本或延遲節省；[獨立基準儲存庫](https://github.com/suenot/codex-jev-router-benchmarks)目前只涵蓋單一任務模型路由。
+
 ## 選用的技能建議
 
 [Claude Code 的 Jev Skill Suggestion 模組](https://www.aitmpl.com/component/mods/productivity/jev-skill-suggestion)依賴 Claude 專用掛鉤。本儲存庫提供 Codex `UserPromptSubmit` 掛鉤：先依 `SKILL.md` 描述排序，再檢查最多三個候選的說明，每輪最多加入一個技能。[Codex 本身已按需載入完整技能說明](https://learn.chatgpt.com/docs/build-skills)；只啟用建議不會移除初始的技能名稱與描述清單。

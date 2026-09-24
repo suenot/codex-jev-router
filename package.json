@@ -1,12 +1,12 @@
 {
   "name": "codex-jev-router",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "private": true,
   "license": "MIT",
   "type": "module",
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "check": "node --check src/decider.mjs && node --check src/alternative-backends.mjs && node --check src/router.mjs && node --check src/route.mjs && node --check src/skill-suggestion.mjs && node --check src/skill-suggestion-hook.mjs && node --check scripts/install.mjs && node --check scripts/install-skill-suggestion.mjs && node --check scripts/node-bridge.mjs && node --check scripts/doctor.mjs && npm test",
+    "check": "node --check src/decider.mjs && node --check src/alternative-backends.mjs && node --check src/privacy.mjs && node --check src/router.mjs && node --check src/route.mjs && node --check src/route-batch.mjs && node --check src/log-decision.mjs && node --check src/batch-decisions.mjs && node --check src/decide-batch.mjs && node --check src/skill-suggestion.mjs && node --check src/skill-suggestion-hook.mjs && node --check scripts/install.mjs && node --check scripts/install-skill-suggestion.mjs && node --check scripts/node-bridge.mjs && node --check scripts/doctor.mjs && npm test",
     "doctor": "node scripts/doctor.mjs"
   },
   "dependencies": {

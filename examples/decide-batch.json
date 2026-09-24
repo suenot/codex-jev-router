@@ -1,0 +1,12 @@
+{
+  "items": [
+    {"id":"ticket-1","state":{"message":"Please update the invoice address."}},
+    {"id":"ticket-2","state":{"message":"Checkout fails for every customer."}},
+    {"id":"ticket-3","state":{"message":"Where can I download receipts?"}}
+  ],
+  "questions": {
+    "team":{"type":"choice","instructions":"Which team should triage this ticket?","criteria":{"billing":"Invoices or receipts","engineering":"Broken product behavior"}},
+    "urgent":{"type":"noul","instructions":"Does this ticket describe an urgent outage?"}
+  },
+  "review_threshold": 0.8
+}

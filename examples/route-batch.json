@@ -1,0 +1,5 @@
+[
+  {"agent_type":"explorer","message":"Find the definition of calculateTotal and report its path."},
+  {"agent_type":"default","message":"Check one documented claim against the official source."},
+  {"agent_type":"worker","message":"Implement and verify the specified small change."}
+]
