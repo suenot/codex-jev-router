@@ -1,6 +1,6 @@
 # Codex Jev Router
 
-[Русская инструкция](README.ru.md)
+[Русская инструкция](README.ru.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
 <p align="center">
   <img src="assets/subagent-routing-comic.png" alt="A small decider routes a simple lookup to Luna, an ordinary bug to Sol, and a complex task to Sol with deeper reasoning." width="820">

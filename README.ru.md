@@ -1,6 +1,6 @@
 # Codex Jev Router
 
-[English documentation](README.md)
+[English documentation](README.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
 <p align="center">
   <img src="assets/subagent-routing-comic.png" alt="Небольшой движок направляет простую задачу Luna, обычное исправление Sol, а сложную задачу Sol с более глубоким рассуждением." width="820">

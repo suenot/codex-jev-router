@@ -4,6 +4,10 @@ All notable changes are documented here in Keep a Changelog format.
 
 ## Unreleased
 
+### Added
+
+- Add Simplified and Traditional Chinese setup guides.
+
 ## [0.4.0] - 2026-09-24
 
 ### Added
