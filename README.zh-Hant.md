@@ -10,7 +10,7 @@
 
 本儲存庫使用 [JevRouter](https://github.com/BillionsBobby/JevRouter) 或其他具型別的決策引擎，重現我的 Codex 子代理設定。你可以把本儲存庫交給日後的 Codex 工作階段，要求它：**閱讀本文、複製儲存庫、執行安裝程式並驗證結果**。安裝程式只修改本機 Codex 設定，修改前會建立備份；無須部署伺服器。
 
-[基準報告（英文）](BENCHMARK.md)現在包含真實的 Django 原始碼任務，Jev 分別選擇了 Luna low、Luna medium 與 Sol low。另有一項 SWE-bench Verified Django 修復任務：Luna medium 與獨立執行的 Sol high 在三次重複中都通過官方測試。報告分別統計 Codex 與 Jev 的權杖、估算 API 成本、工具呼叫及小樣本的限制；早期合成結果標為歷史資料。
+[獨立的基準儲存庫](https://github.com/suenot/codex-jev-router-benchmarks)保存[完整報告（英文）](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md)、執行腳本、任務資料和追蹤紀錄。其中包含 Jev 選擇 Luna low、Luna medium 與 Sol low 的 Django 原始碼任務，以及 Luna medium 與獨立執行的 Sol high 均在三次重複中通過官方測試的 SWE-bench Verified Django 修復任務。Codex 與 Jev 的權杖分別統計；早期合成結果標為歷史資料。
 
 ## 安裝後會設定什麼
 

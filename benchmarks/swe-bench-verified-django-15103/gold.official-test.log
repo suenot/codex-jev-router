@@ -1,8 +1,0 @@
-..
-----------------------------------------------------------------------
-Ran 2 tests in 0.001s
-
-OK
-Testing against Django installed in '<BENCHMARK_TMP>/codex-jev-code-cheap/django-15103-gold/django'
-Found 2 test(s).
-System check identified no issues (0 silenced).

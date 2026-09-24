@@ -4,6 +4,17 @@ All notable changes are documented here in Keep a Changelog format.
 
 ## Unreleased
 
+## [0.7.1] - 2026-09-25
+
+### Changed
+
+- Move the benchmark report, runner, grading code, and recorded artifacts to [suenot/codex-jev-router-benchmarks](https://github.com/suenot/codex-jev-router-benchmarks).
+- Link the separate benchmark report from all setup guides.
+
+### Removed
+
+- Remove the synthetic benchmark command and archived benchmark files from the router package; run them from the benchmark repository.
+
 ## [0.7.0] - 2026-09-24
 
 ### Added

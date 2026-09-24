@@ -1,7 +1,0 @@
-SWE-bench Verified django__django-16527
-Base commit: bd366ca2aeffa869b7dbc0b0aa01caea75e6dc31
-Python: 3.10.21
-Dependencies: asgiref==3.12.1, sqlparse==0.6.0, typing-extensions==4.16.0
-Official test: python tests/runtests.py admin_views.test_templatetags.AdminTemplateTagsTest.test_submit_row_save_as_new_add_permission_required --noinput
-Related class: python tests/runtests.py admin_views.test_templatetags.AdminTemplateTagsTest --noinput
-The test.patch was not available to agents during their runs.

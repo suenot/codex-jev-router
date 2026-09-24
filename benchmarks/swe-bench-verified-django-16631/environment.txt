@@ -1,9 +1,0 @@
-SWE-bench Verified: django__django-16631
-Base commit: 9b224579875e30203d079cc2fee83b116d98eb78
-Codex: codex-cli 0.156.1
-Python: Python 3.10.21
-Dependencies: asgiref==3.12.1 sqlparse==0.6.0 typing-extensions==4.16.0
-Codex home: isolated temporary directory; only an auth.json symlink
-Codex flags: --json --ephemeral --ignore-user-config --ignore-rules -s workspace-write -c approval_policy=never
-Official test command (from tests/): python runtests.py auth_tests.test_basic.TestGetUser.test_get_user_fallback_secret --noinput
-Suite command (from checkout root): python tests/runtests.py auth_tests sessions_tests --verbosity 1 --noinput
