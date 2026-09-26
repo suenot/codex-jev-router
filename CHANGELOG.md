@@ -4,8 +4,14 @@ All notable changes are documented here in Keep a Changelog format.
 
 ## Unreleased
 
+## [0.9.0] - 2026-09-26
+
 ### Changed
 
+- Keep the continuing parent session on its configured Sol model and effort; require a useful delegation before asking the decider for a child model.
+- Disable automatic Sol-low routing and map older Sol-low replies to the Sol-high fallback.
+- Update the four setup guides and installer instructions for the delegation gate and fixed parent model.
+- Document the randomized four-arm benchmark: optional delegation used no children and cost 2.7% more than direct Sol xhigh; Jev-routed children cost 27.2% less than fixed Sol-high children but 69.7% more than direct Sol xhigh.
 - Document full parent-plus-child benchmark costs in all four setup guides and distinguish them from earlier worker-only savings.
 - Document the routing economics audit, external router research, and the measured break-even limits in English and Russian.
 - Link the directly routed root experiment and its quality and API-price limits from all four setup guides.

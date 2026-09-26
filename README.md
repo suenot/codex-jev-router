@@ -6,11 +6,13 @@
   <img src="assets/subagent-routing-comic.png" alt="A small decider routes a simple lookup to Luna, an ordinary bug to Sol, and a complex task to Sol with deeper reasoning." width="820">
 </p>
 
-One short decision before each subagent selects Luna low or medium, Sol low or high, or Sol ultra for exceptional work.
+The continuing Codex session stays on Sol xhigh. When a subagent is useful, one short decision selects Luna low or medium, Sol high, or Sol ultra for exceptional work.
 
 This repository reproduces my Codex subagent setup with [JevRouter](https://github.com/BillionsBobby/JevRouter) or another typed decision engine. It is meant to be handed to a future Codex session as an instruction: **read this file, clone the repository, run the installer, and verify the result**. The installer modifies only local Codex configuration and creates a backup first. It does not require a server deployment.
 
 The [separate benchmark repository](https://github.com/suenot/codex-jev-router-benchmarks) contains the [full report](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md), runner, task data, and traces. It includes 12 preregistered Django source tasks routed to Luna low, Luna medium, and Sol low, plus earlier selected source and code-fix comparisons. The estimates use published API rates, not observed Codex subscription charges.
+
+**New four-arm result:** Six public offline fixture tasks ran three times per arm, with all four arms passing 18/18 strict checks. One Sol-xhigh agent cost an estimated **$0.337455**; the same agent following the optional-delegation rule cost **$0.346462 (+2.7%)** and spawned no children. A Sol-xhigh parent with a fixed Sol-high child cost **$0.786760**; with a Jev-routed child it cost **$0.572820 (27.2% less than the fixed-child arm, 69.7% more than one agent)**. The new policy avoids unnecessary child sessions in this fixture; it has **not demonstrated a saving against direct Sol xhigh**. These are illustrative API prices, not subscription charges or a continuing-thread cache test. See the [independent audit and task-level results](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/benchmarks/mixed-2026-09-26/REPORT.md).
 
 Read the [economics audit](AUDIT.md) ([Russian](AUDIT.ru.md)) for the parent-versus-child cost breakdown, research on other routers, and a concrete repair path.
 
@@ -22,23 +24,23 @@ Read the [economics audit](AUDIT.md) ([Russian](AUDIT.ru.md)) for the parent-ver
 
 | Setting | Value |
 | --- | --- |
+| Continuing parent session | Keep its configured `gpt-6-sol`, `xhigh`; the installer does not change it |
 | Normal subagent task or fallback | `gpt-6-sol`, `high` reasoning |
 | Very simple, bounded subagent task | `gpt-6-luna`, `low`, only with strong decider confidence |
 | Clear, bounded task with a few straightforward steps or a prescribed small edit | `gpt-6-luna`, `medium`, when the decider prefers it with sufficient confidence |
-| Short, focused task requiring Sol-level judgment | `gpt-6-sol`, `low`, only with strong decider confidence |
 | Exceptional task or verified Sol failure | `gpt-6-sol`, `ultra` |
 
-The installer configures only subagent model defaults, adds a routing section to `~/.codex/AGENTS.md`, and removes fixed models from the `explorer`, `reviewer`, and `worker` role files. It creates those role files when missing. A parent agent routes a short task summary before `spawn_agent`, then passes the selected `model` and `reasoning_effort` explicitly. The `reviewer` role remains on Sol high unless the task qualifies for Sol ultra.
+The installer configures only subagent model defaults, adds a routing section to `~/.codex/AGENTS.md`, and removes fixed models from the `explorer`, `reviewer`, and `worker` role files. It creates those role files when missing. The parent first decides whether a child adds value. For a justified child, it routes a short task summary before `spawn_agent`, then passes the selected `model` and `reasoning_effort` explicitly. The `reviewer` role remains on Sol high unless the task qualifies for Sol ultra. Automatic Sol-low routing is disabled: it shares Sol-high token prices and performed worse in the earlier measured category.
 
 ### Search and research
 
-The router also chooses models for **delegated** web research and file or log searches. It chooses a model for the subagent session, not for each web or shell search call. When the parent agent searches directly, it keeps its current model. Delegate only when the research is useful as an independent task; use the `default` role for web research and `explorer` for read-only file or log search.
+The router also chooses models for **delegated** web research and file or log searches. It chooses a model for the subagent session, not for each web or shell search call. When the parent agent searches directly, it keeps its current model. One serial lookup, short read, or focused claim check belongs in the parent. Delegate when parallel work, isolated substantial context, independent review, or an explicit request justifies a child; use the `default` role for web research and `explorer` for read-only file or log search. Do not call Jev to decide whether Jev is needed.
 
 | Delegated task | Expected route |
 | --- | --- |
 | Find one named symbol, exact log entry, or fact on one known official page | Luna low when the decider is confident |
 | Extract facts from a few specified files or logs and return a structured summary | Luna medium when the decider is confident |
-| Verify one specific claim against an authoritative page or compare two documented options | Sol low when the decider is confident |
+| Verify one specific claim against an authoritative page or compare two documented options | Parent Sol xhigh directly; Sol high if independently delegated |
 | Compare current sources, resolve conflicting claims, or synthesize research | Sol high |
 | Correlate logs across services or trace an ambiguous cause through files | Sol high |
 | Exceptionally difficult investigation or a verified Sol failure | Sol ultra |
@@ -86,12 +88,12 @@ The `npm ci` dependency is pinned to a JevRouter commit; npm may use GitHub SSH 
 
 The [alternative backend guide](BACKENDS.md) lists all ten projects, their actual interfaces, setup variables, and limitations. These presets are optional; the default remains hosted Jev. `CODEX_ROUTER_DECIDER_TIMEOUT_MS` can raise the 15-second HTTP timeout or 120-second one-shot bridge timeout (1,000–600,000 ms). A local model's probabilities are not automatically calibrated for this router's confidence thresholds. Test its decisions on your tasks before relying on cheaper routes.
 
-For HTTP backends, `CODEX_ROUTER_DECIDER_API_KEY` adds a bearer token and `CODEX_ROUTER_DECIDER_MODEL` sets the optional request `model` where supported. `simple-jev` defaults to `Qwen/Qwen3.5-0.8B`; set the model variable if the server serves another ID. The `command` adapter receives one JSON request on stdin and must write one Jev-shaped JSON response to stdout. It runs without a shell. The request has `state` and `questions`; the response must contain `answers.tier` (`choice`, `confidence`, `probabilities`) and `answers.exceptional` (`noul`). The `tier` choice is `luna_low`, `luna_medium`, `sol_low`, or `sol_high`; older adapter responses using `luna` still select Luna low. The router validates the answer using JevRouter's typed helpers. A failed or malformed response selects Sol high.
+For HTTP backends, `CODEX_ROUTER_DECIDER_API_KEY` adds a bearer token and `CODEX_ROUTER_DECIDER_MODEL` sets the optional request `model` where supported. `simple-jev` defaults to `Qwen/Qwen3.5-0.8B`; set the model variable if the server serves another ID. The `command` adapter receives one JSON request on stdin and must write one Jev-shaped JSON response to stdout. It runs without a shell. The request has `state` and `questions`; the response must contain `answers.tier` (`choice`, `confidence`, `probabilities`) and `answers.exceptional` (`noul`). The `tier` choice is `luna_low`, `luna_medium`, or `sol_high`; older adapter responses using `luna` still select Luna low. A legacy `sol_low` response now selects Sol high. The router validates the answer using JevRouter's typed helpers. A failed or malformed response selects Sol high.
 
 Example adapter response:
 
 ```json
-{"answers":{"tier":{"type":"choice","choice":"sol_low","confidence":0.9,"probabilities":{"luna_low":0.02,"luna_medium":0.03,"sol_low":0.9,"sol_high":0.05}},"exceptional":{"type":"noul","noul":0.02}}}
+{"answers":{"tier":{"type":"choice","choice":"luna_medium","confidence":0.9,"probabilities":{"luna_low":0.02,"luna_medium":0.93,"sol_high":0.05}},"exceptional":{"type":"noul","noul":0.02}}}
 ```
 
 For local Laya, install and start its [Jev-compatible HTTP server](https://github.com/NandhaKishorM/laya#self-hosting-http-server-jev-compatible) separately:

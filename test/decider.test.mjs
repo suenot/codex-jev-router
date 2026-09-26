@@ -6,7 +6,7 @@ import { routeSubagent } from '../src/router.mjs';
 
 const response = {
   answers: {
-    tier: { type: 'choice', choice: 'luna_low', confidence: 0.96, probabilities: { luna_low: 0.96, luna_medium: 0.01, sol_low: 0.01, sol_high: 0.02 } },
+    tier: { type: 'choice', choice: 'luna_low', confidence: 0.96, probabilities: { luna_low: 0.96, luna_medium: 0.02, sol_high: 0.02 } },
     exceptional: { type: 'noul', noul: 0.02 },
   },
 };
@@ -31,7 +31,7 @@ test('Laya-compatible HTTP decider receives typed questions and selects Luna', a
     assert.equal(request.body.model, 'multilingual');
     assert.equal(request.body.state.role, 'explorer');
     assert.equal(request.body.questions.tier.type, 'choice');
-    assert.deepEqual(Object.keys(request.body.questions.tier.criteria), ['luna_low', 'luna_medium', 'sol_low', 'sol_high']);
+    assert.deepEqual(Object.keys(request.body.questions.tier.criteria), ['luna_low', 'luna_medium', 'sol_high']);
     assert.equal(request.body.questions.exceptional.type, 'noul');
   } finally {
     server.close();
@@ -103,14 +103,14 @@ for (const [kind, reply, path, check] of [
     assert.equal(body.states[0].questions.tier.criteria.luna_low.startsWith('One exact'), true);
   }],
   ['minojev', { records: [
-    { id: 'route', qid: 'tier', candidate_ids: ['luna_low', 'luna_medium', 'sol_low', 'sol_high'], probabilities: [0.96, 0.01, 0.01, 0.02] },
+    { id: 'route', qid: 'tier', candidate_ids: ['luna_low', 'luna_medium', 'sol_high'], probabilities: [0.96, 0.02, 0.02] },
     { id: 'route', qid: 'exceptional', candidate_ids: ['false', 'true'], probabilities: [0.98, 0.02] },
   ] }, '/score', body => assert.equal(body.questions.exceptional.type, 'boolean')],
   ['mini-jev', { arms: { split: { fields: {
-    tier: { options: ['luna_low', 'luna_medium', 'sol_low', 'sol_high'], p: [0.96, 0.01, 0.01, 0.02] },
+    tier: { options: ['luna_low', 'luna_medium', 'sol_high'], p: [0.96, 0.02, 0.02] },
     exceptional: { options: ['true', 'false'], p: [0.02, 0.98] },
   } } } }, '/run', body => {
-    assert.equal(body.schema.properties.tier.enum.length, 4);
+    assert.equal(body.schema.properties.tier.enum.length, 3);
     assert.equal(body.with_labels, false);
     assert.equal(body.repeats, 1);
   }],

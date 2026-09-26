@@ -6,11 +6,13 @@
   <img src="assets/subagent-routing-comic.png" alt="一個輕量決策器將簡單查找交給 Luna、一般錯誤修復交給 Sol，複雜任務則交給採用更高推理強度的 Sol。" width="820">
 </p>
 
-每次啟動子代理前，路由器會做一次簡短決策：選擇 Luna low 或 medium、Sol low 或 high；只有特別困難的任務才選擇 Sol ultra。
+持續執行的 Codex 主工作階段固定使用 Sol xhigh。確實需要子代理時，路由器才為它選擇 Luna low、Luna medium、Sol high，或在特別困難時選擇 Sol ultra。
 
 本儲存庫使用 [JevRouter](https://github.com/BillionsBobby/JevRouter) 或其他具型別的決策引擎，重現我的 Codex 子代理設定。你可以把本儲存庫交給日後的 Codex 工作階段，要求它：**閱讀本文、複製儲存庫、執行安裝程式並驗證結果**。安裝程式只修改本機 Codex 設定，修改前會建立備份；無須部署伺服器。
 
 [獨立的基準儲存庫](https://github.com/suenot/codex-jev-router-benchmarks)保存[完整報告（英文）](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md)、執行腳本、任務資料和追蹤紀錄。測試包含 12 項事先確定的 Django 原始碼任務，Jev 為其選擇 Luna low、Luna medium 或 Sol low；另有較早的程式碼查找與修復樣本。成本依公開的 API 價格估算，並非 Codex 訂閱的實際帳單。
+
+**新的四組對照：**六項公開的離線任務在每組執行三次；四組均通過 18/18 次嚴格檢查。單一 Sol xhigh 代理的 API 估算成本為 **$0.337455**；遵循可選委派規則的同模型代理為 **$0.346462（增加 2.7%）**，且未啟動子代理。Sol xhigh 主代理加固定 Sol high 子代理為 **$0.786760**；由 Jev 選擇子代理模型時為 **$0.572820（比固定子代理低 27.2%，但比單代理高 69.7%）**。新規則在這組任務中避免了多餘的子代理工作階段，但**未證明相對於直接使用 Sol xhigh 能省錢**。這些是 API 費率估算，並非訂閱帳單，也未測試持續對話中的快取。[獨立稽核與逐任務結果](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/benchmarks/mixed-2026-09-26/REPORT.md)。
 
 [成本稽核（英文）](AUDIT.md)及[俄文版](AUDIT.ru.md)分析主代理與子代理的完整成本、其他路由專案及改善方案。
 
@@ -22,23 +24,23 @@
 
 | 情境 | 模型與推理強度 |
 | --- | --- |
+| 持續執行的主工作階段 | 保留既有的 `gpt-6-sol`、`xhigh`；安裝程式不修改它 |
 | 一般子代理任務或備用方案 | `gpt-6-sol`，`high` |
 | 非常簡單且範圍明確的子代理任務 | `gpt-6-luna`，`low`，僅在決策器高度確信時使用 |
 | 步驟不多、範圍明確的任務或已有明確做法的小修改 | `gpt-6-luna`，`medium`，在決策器有足夠把握時使用 |
-| 需要 Sol 判斷能力的簡短、聚焦任務 | `gpt-6-sol`，`low`，僅在決策器高度確信時使用 |
 | 特別困難的任務或已確認 Sol 未能解決的任務 | `gpt-6-sol`，`ultra` |
 
-安裝程式只設定子代理的預設模型，在 `~/.codex/AGENTS.md` 中加入路由規則，並從 `explorer`、`reviewer`、`worker` 角色檔案中移除固定模型。若角色檔案不存在，安裝程式會建立它們。父代理在呼叫 `spawn_agent` 前，先根據簡短的任務摘要進行路由，再明確傳入選定的 `model` 和 `reasoning_effort`。`reviewer` 角色預設使用 Sol high，只有符合特別困難的條件時才使用 Sol ultra。
+安裝程式只設定子代理的預設模型，在 `~/.codex/AGENTS.md` 中加入路由規則，並從 `explorer`、`reviewer`、`worker` 角色檔案中移除固定模型。若角色檔案不存在，安裝程式會建立它們。主代理先判斷子代理是否有實際價值；若需要，再根據簡短的任務摘要進行路由，並向 `spawn_agent` 明確傳入 `model` 和 `reasoning_effort`。`reviewer` 角色預設使用 Sol high，只有符合特別困難的條件時才使用 Sol ultra。自動選擇 Sol low 已停用：它與 Sol high 的每 token 價格相同，先前該類任務的實測成本較高。
 
 ### 搜尋與研究
 
-路由器也會為**委派給子代理的**網路研究、檔案搜尋和日誌搜尋選擇模型。它選擇的是整個子代理工作階段的模型，而非每次網頁或命令列搜尋所用的模型。父代理直接搜尋時仍使用目前的模型。只有研究工作適合作為獨立任務時才委派：網路研究使用 `default` 角色；唯讀的檔案或日誌搜尋使用 `explorer`。
+路由器也會為**委派給子代理的**網路研究、檔案搜尋和日誌搜尋選擇模型。它選擇的是整個子代理工作階段的模型，而非每次網頁或命令列搜尋所用的模型。父代理直接搜尋時仍使用目前的模型。單次查找、簡短閱讀或核實一項說法由主代理直接處理。只有平行工作、大量上下文隔離、獨立審查或使用者明確要求時，才考慮子代理：網路研究使用 `default` 角色；唯讀的檔案或日誌搜尋使用 `explorer`。不要詢問 Jev 是否需要 Jev。
 
 | 委派任務 | 預期路由 |
 | --- | --- |
 | 查找一個指定符號、確切的日誌記錄，或已知官方頁面上的一項事實 | 決策器確信時使用 Luna low |
 | 從少數指定檔案或日誌中擷取事實，形成結構化摘要 | 決策器確信時使用 Luna medium |
-| 對照權威頁面核實一項具體說法，或比較兩個已有文件說明的選項 | 決策器確信時使用 Sol low |
+| 對照權威頁面核實一項具體說法，或比較兩個已有文件說明的選項 | 主代理直接使用 Sol xhigh；獨立委派時使用 Sol high |
 | 比較最新資料、解決資料衝突，或綜合研究結果 | Sol high |
 | 關聯多個服務的日誌，或在檔案中追查原因不明的問題 | Sol high |
 | 特別困難的調查，或已確認 Sol 未能解決的問題 | Sol ultra |
@@ -86,12 +88,12 @@ npm run doctor -- --live
 
 [十種替代專案的設定說明（英文）](BACKENDS.md)列出實際介面、環境變數及限制。預設仍使用代管 Jev。HTTP 請求預設逾時 15 秒，單次命令轉接器預設逾時 120 秒；可用 `CODEX_ROUTER_DECIDER_TIMEOUT_MS` 調整。其他模型的機率未針對本路由器校準，使用低成本路由前應先以自己的任務驗證。
 
-對 HTTP 後端，`CODEX_ROUTER_DECIDER_API_KEY` 會加入 bearer 權杖，`CODEX_ROUTER_DECIDER_MODEL` 可設定請求中的 `model` 欄位（如果支援）；`simple-jev` 預設使用 `Qwen/Qwen3.5-0.8B`。`command` 轉接程式從 stdin 接收一筆 JSON 請求，並向 stdout 輸出一筆符合 Jev 格式的 JSON 回應。它不會透過 shell 啟動。請求包含 `state` 和 `questions`；回應必須包含 `answers.tier`（`choice`、`confidence`、`probabilities`）和 `answers.exceptional`（`noul`）。`tier` 可選擇 `luna_low`、`luna_medium`、`sol_low` 或 `sol_high`；舊版轉接程式回傳的 `luna` 仍會選中 Luna low。路由器使用 JevRouter 的具型別輔助函式驗證答案。失敗或格式錯誤時會回退至 Sol high。
+對 HTTP 後端，`CODEX_ROUTER_DECIDER_API_KEY` 會加入 bearer 權杖，`CODEX_ROUTER_DECIDER_MODEL` 可設定請求中的 `model` 欄位（如果支援）；`simple-jev` 預設使用 `Qwen/Qwen3.5-0.8B`。`command` 轉接程式從 stdin 接收一筆 JSON 請求，並向 stdout 輸出一筆符合 Jev 格式的 JSON 回應。它不會透過 shell 啟動。請求包含 `state` 和 `questions`；回應必須包含 `answers.tier`（`choice`、`confidence`、`probabilities`）和 `answers.exceptional`（`noul`）。`tier` 可選擇 `luna_low`、`luna_medium` 或 `sol_high`；舊版轉接程式回傳的 `luna` 仍會選中 Luna low，原有 `sol_low` 現在回退至 Sol high。路由器使用 JevRouter 的具型別輔助函式驗證答案。失敗或格式錯誤時會回退至 Sol high。
 
 轉接程式回應範例：
 
 ```json
-{"answers":{"tier":{"type":"choice","choice":"sol_low","confidence":0.9,"probabilities":{"luna_low":0.02,"luna_medium":0.03,"sol_low":0.9,"sol_high":0.05}},"exceptional":{"type":"noul","noul":0.02}}}
+{"answers":{"tier":{"type":"choice","choice":"luna_medium","confidence":0.9,"probabilities":{"luna_low":0.02,"luna_medium":0.93,"sol_high":0.05}},"exceptional":{"type":"noul","noul":0.02}}}
 ```
 
 如需使用本機 Laya，請另外安裝並啟動其[相容 Jev 的 HTTP 伺服器](https://github.com/NandhaKishorM/laya#self-hosting-http-server-jev-compatible)：

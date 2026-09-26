@@ -13,7 +13,7 @@ test('Sol stays the default for uncertain and review work', () => {
   assert.equal(chooseModel(answer('sol_high', 0.99, { sol_high: 0.99 }, 0.79)).reasoning_effort, 'high');
 });
 
-test('Luna low and medium and Sol low handle confident bounded tasks', () => {
+test('Luna low and medium handle confident bounded tasks; legacy Sol low falls back to high', () => {
   const simple = chooseModel(answer('luna_low', 0.95, { luna_low: 0.96 }, 0.04));
   assert.equal(simple.model, LUNA);
   assert.equal(simple.reasoning_effort, 'low');
@@ -24,7 +24,7 @@ test('Luna low and medium and Sol low handle confident bounded tasks', () => {
     model: LUNA, reasoning_effort: 'medium', reason: 'bounded',
   });
   assert.deepEqual(chooseModel(answer('sol_low', 0.94, { sol_low: 0.91 }, 0.04)), {
-    model: SOL, reasoning_effort: 'low', reason: 'focused',
+    model: SOL, reasoning_effort: 'high', reason: 'default',
   });
   assert.equal(chooseModel(answer('luna', 0.95, { luna: 0.96 }, 0.04)).reasoning_effort, 'low');
 });

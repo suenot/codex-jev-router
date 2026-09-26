@@ -12,7 +12,6 @@ const QUESTIONS = {
     criteria: {
       luna_low: 'One exact target and brief result: find a named symbol or exact log entry, read one known page for a fact, or make a trivial mechanical edit. Almost no judgment.',
       luna_medium: 'Clear bounded brief with several straightforward coordinated steps: extract facts from a few specified files or logs, summarize known material, or make small prescribed edits in known files. Little ambiguity.',
-      sol_low: 'Short focused task needing Sol-level judgment: check one specific claim against an authoritative source, assess one small diff, or choose between two documented options. Limited investigation.',
       sol_high: 'Default for ambiguous or multi-source research, root-cause diagnosis, normal implementation, substantial code review, or work requiring synthesis and validation.',
     },
   },
@@ -42,9 +41,6 @@ export function chooseModel({ tier, exceptional }, { role = 'default', solFailed
     }
     if (tier.choice === 'luna_medium' && tier.confidence >= 0.6 && score(tier, 'luna_medium') >= 0.7) {
       return { model: LUNA, reasoning_effort: 'medium', reason: 'bounded' };
-    }
-    if (tier.choice === 'sol_low' && tier.confidence >= 0.75 && score(tier, 'sol_low') >= 0.8) {
-      return { model: SOL, reasoning_effort: 'low', reason: 'focused' };
     }
   }
   return { model: SOL, reasoning_effort: 'high', reason: 'default' };
