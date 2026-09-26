@@ -10,9 +10,9 @@
 
 本仓库使用 [JevRouter](https://github.com/BillionsBobby/JevRouter) 或其他类型化决策引擎，复现我的 Codex 子代理配置。你可以把本仓库交给今后的 Codex 会话，并要求它：**阅读本文、克隆仓库、运行安装程序并验证结果**。安装程序只修改本地 Codex 配置，修改前会创建备份；无需部署服务器。
 
-[独立的基准仓库](https://github.com/suenot/codex-jev-router-benchmarks)保存[完整报告（英文）](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md)、运行脚本、任务数据和跟踪记录。其中包括 Jev 选择 Luna low、Luna medium 和 Sol low 的 Django 源码任务，以及 Luna medium 与独立运行的 Sol high 均在三次重复中通过官方测试的 SWE-bench Verified Django 修复任务。成本估算包含单独计价的 Jev 决策；早期合成结果标为历史数据。
+[独立的基准仓库](https://github.com/suenot/codex-jev-router-benchmarks)保存[完整报告（英文）](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md)、运行脚本、任务数据和跟踪记录。测试包括 12 项预先确定的 Django 源码任务，Jev 为其选择 Luna low、Luna medium 或 Sol low；另有较早的代码查找和修复样本。成本按公开的 API 价格估算，并非 Codex 订阅的实际账单。
 
-**按 API 定价估算的成本节省：**九组 Django 源码任务的配对运行节省 **71.0%**（$0.214806 → $0.062317；两组各 9/9 正确）；同一项限定范围的 Django 修复在三组配对运行中节省 **98.3%**（$0.555916 → $0.009668；两组各 3/3 通过官方测试）。路由后的总成本已包含 Jev。这是针对所选任务、按 Standard 短上下文 API 定价计算的估算值，并非 Codex 订阅的实际账单，也不能作为一般任务的节省预测。计算方法和限制见[完整报告](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md#estimated-api-cost-savings)。
+**完整工作流程的成本：**12 项 Django 源码任务各重复两次，共 24 组配对运行。单个 Sol high 会话的 API 估算成本为 **$0.452677**（严格评分 22/24）；Sol high 主代理为每项任务启动一个由 Jev 选择的子代理，成本为 **$0.657100**（21/24），**高出 45.2%**。将同样的任务分成每组四项后，主代理加子代理方案比单个连续运行的 Sol high 会话**贵 182.5%**。一组 Django 代码修复对照则相反：两种方案均通过本地官方测试，主代理加子代理方案**便宜 60.7%**，但耗时**增加 50.5%**。以上均计入主代理、子代理和 Jev。早期 71.0% 与 98.3% 的节省数据只计算所选工作模型及 Jev，**未计入主代理**。[方法与限制](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md#full-codex-workflow-one-sol-high-agent-or-a-routed-subagent)。
 
 ## 安装后会配置什么
 
@@ -139,7 +139,7 @@ node src/decide-batch.mjs < examples/decide-batch.json
 
 输入包含 3–24 个具有唯一 `id` 和 `state` 的 `items`、共用的 `questions`，以及可选的 `review_threshold`（默认 `0.8`）。输出包含类型化答案和每条记录的 `needs_review`。Codex 只需复核标记的记录并完成实际工作；此命令不会执行任务或调用 Codex 模型。答案缺失和后端故障也会标记复核。私密记录应先清理，或交给可信的本地后端，避免发送到托管服务。常见凭据格式会被拒绝，但检查无法发现所有秘密。
 
-仅当同类决策和输入已准备好时才使用批量命令。先问 Jev「是否需要 Jev」本身就增加一次调用，因此这里根据已准备记录的数量和问题类型决定是否使用。尚未测量这些新命令的端到端成本或延迟节省；[独立基准仓库](https://github.com/suenot/codex-jev-router-benchmarks)目前只覆盖单任务模型路由。
+仅当同类决策和输入已准备好时才使用批量命令。先问 Jev「是否需要 Jev」本身就增加一次调用，因此这里根据已准备记录的数量和问题类型决定是否使用。这些批量命令本身没有经过节省成本的验证。[独立基准测试](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md#four-tasks-in-one-parent-session)比较了四个路由子代理与单个连续运行的 Sol high 会话；在该样本中，子代理方案成本更高。
 
 ## 可选的技能推荐
 

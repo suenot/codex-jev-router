@@ -4,6 +4,10 @@ All notable changes are documented here in Keep a Changelog format.
 
 ## Unreleased
 
+### Changed
+
+- Document full parent-plus-child benchmark costs in all four setup guides and distinguish them from earlier worker-only savings.
+
 ## [0.8.0] - 2026-09-25
 
 ### Added
