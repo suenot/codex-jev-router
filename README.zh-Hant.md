@@ -12,7 +12,11 @@
 
 [獨立的基準儲存庫](https://github.com/suenot/codex-jev-router-benchmarks)保存[完整報告（英文）](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md)、執行腳本、任務資料和追蹤紀錄。測試包含 12 項事先確定的 Django 原始碼任務，Jev 為其選擇 Luna low、Luna medium 或 Sol low；另有較早的程式碼查找與修復樣本。成本依公開的 API 價格估算，並非 Codex 訂閱的實際帳單。
 
+[成本稽核（英文）](AUDIT.md)及[俄文版](AUDIT.ru.md)分析主代理與子代理的完整成本、其他路由專案及改善方案。
+
 **完整工作流程的成本：**12 項 Django 原始碼任務各重複兩次，共 24 組成對執行。單一 Sol high 工作階段的 API 估算成本為 **$0.452677**（嚴格評分 22/24）；Sol high 主代理為每項任務啟動一個由 Jev 選擇的子代理，成本為 **$0.657100**（21/24），**高出 45.2%**。將相同任務分為每組四項後，主代理加子代理方案比單一持續執行的 Sol high 工作階段**貴 182.5%**。一組 Django 程式碼修復對照則相反：兩種方案均通過本機官方測試，主代理加子代理方案**便宜 60.7%**，但耗時**增加 50.5%**。以上均計入主代理、子代理與 Jev。早期 71.0% 與 98.3% 的節省數據只計算選用的工作模型及 Jev，**未計入主代理**。[方法與限制](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md#full-codex-workflow-one-sol-high-agent-or-a-routed-subagent)。
+
+**執行前選擇模型：**Jev 先為單一 Codex 主工作階段選擇模型，不建立子代理。24 次執行的 API 估算成本（含 Jev）為 **$0.184377**，先前保存的 Sol high 對照為 **$0.452677**，降低 **59.3%**；嚴格評分為 **21/24 對 22/24**。新執行與歷史對照未隨機交錯，無法證明品質相同或普遍節省。[方法與紀錄](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md#direct-routing-before-the-root-codex-turn)。
 
 ## 安裝後會設定什麼
 

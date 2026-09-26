@@ -7,6 +7,8 @@ All notable changes are documented here in Keep a Changelog format.
 ### Changed
 
 - Document full parent-plus-child benchmark costs in all four setup guides and distinguish them from earlier worker-only savings.
+- Document the routing economics audit, external router research, and the measured break-even limits in English and Russian.
+- Link the directly routed root experiment and its quality and API-price limits from all four setup guides.
 
 ## [0.8.0] - 2026-09-25
 

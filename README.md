@@ -12,7 +12,11 @@ This repository reproduces my Codex subagent setup with [JevRouter](https://gith
 
 The [separate benchmark repository](https://github.com/suenot/codex-jev-router-benchmarks) contains the [full report](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md), runner, task data, and traces. It includes 12 preregistered Django source tasks routed to Luna low, Luna medium, and Sol low, plus earlier selected source and code-fix comparisons. The estimates use published API rates, not observed Codex subscription charges.
 
+Read the [economics audit](AUDIT.md) ([Russian](AUDIT.ru.md)) for the parent-versus-child cost breakdown, research on other routers, and a concrete repair path.
+
 **Full-workflow result:** Across 24 paired runs of 12 Django source tasks, one Sol-high session cost an estimated **$0.452677** (22/24 strict checks); a Sol-high parent with one Jev-routed child per task cost **$0.657100** (21/24), **45.2% more**. In six four-task runs on those same tasks, the parent-plus-children arm cost **182.5% more** than one continuing Sol-high session. One paired Django code fix went the other way: both arms passed the local official test, and the parent-plus-child arm cost **60.7% less**, but took **50.5% longer**. These totals count parent, children, and Jev. Earlier 71.0% and 98.3% savings priced only the chosen worker and Jev, **excluding the parent**. See the [method and limits](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md#full-codex-workflow-one-sol-high-agent-or-a-routed-subagent).
+
+**Pre-turn experiment:** Choosing the model before one root Codex session, with no subagent, cost an estimated **$0.184377** including Jev versus the historical Sol-high control's **$0.452677** (**59.3% less**). Strict checks were **21/24 versus 22/24**; this later-run comparison does not establish equal quality or a general saving. [Methods and traces](https://github.com/suenot/codex-jev-router-benchmarks/blob/main/BENCHMARK.md#direct-routing-before-the-root-codex-turn).
 
 ## What it installs
 
